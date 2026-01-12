@@ -2,235 +2,127 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Yaswanth Fleet Audit</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Tailwind -->
+<title>YASWANTH Fleet Audit</title>
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Firebase v8 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
 <style>
-body { font-family: system-ui, sans-serif; }
-.page { display: none; }
-[contenteditable="true"] {
-  background: #eef2ff;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
+body{font-family:'Inter',sans-serif}
+.page{display:none}
 </style>
 </head>
+<body class="bg-slate-100">
 
-<body class="bg-gradient-to-br from-blue-100 to-indigo-200">
-
-<div class="max-w-6xl mx-auto p-6">
-
-<!-- ================= HEADER ================= -->
-<header class="bg-white/90 backdrop-blur p-4 rounded-xl shadow flex justify-between items-center mb-6">
-
+<header class="bg-white p-4 shadow flex justify-between items-center">
 <div class="flex gap-3 items-center">
 <select id="yearSelector" class="border px-2 py-1 rounded" onchange="changeYear(this.value)"></select>
-
-<button onclick="adminLogin()" class="bg-slate-800 text-white px-3 py-1 rounded text-sm">
-Admin
-</button>
+<button onclick="adminLogin()" class="bg-black text-white px-3 py-1 rounded">Admin</button>
 </div>
-
-<nav class="flex gap-4 text-sm font-semibold">
+<nav class="flex gap-4">
 <button onclick="showPage('home')">Home</button>
-<button onclick="showPage('auditSelect')">Audit</button>
-<button onclick="showPage('payrollSelect')">Payroll</button>
+<button onclick="showPage('audit')">Audit</button>
 </nav>
 </header>
 
-<!-- ================= HOME ================= -->
+<main class="p-6">
 <section id="home" class="page">
-<h1 class="text-3xl font-bold text-center mb-8">Dashboard</h1>
-
-<div class="grid md:grid-cols-3 gap-6">
-<div onclick="showPage('auditSelect')" class="bg-white p-6 rounded-xl shadow cursor-pointer">
-<h2 class="font-bold">Monthly Audit</h2>
-<p class="text-sm text-gray-500">Bus income & expense</p>
-</div>
-
-<div onclick="showPage('dieselSelect')" class="bg-white p-6 rounded-xl shadow cursor-pointer">
-<h2 class="font-bold">Diesel Audit</h2>
-<p class="text-sm text-gray-500">Fuel tracking</p>
-</div>
-
-<div onclick="showPage('payrollSelect')" class="bg-white p-6 rounded-xl shadow cursor-pointer">
-<h2 class="font-bold">Payroll</h2>
-<p class="text-sm text-gray-500">Driver payments</p>
-</div>
-</div>
+<h1 class="text-2xl font-bold">Dashboard</h1>
 </section>
 
-<!-- ================= MONTH SELECT ================= -->
-<section id="auditSelect" class="page bg-white p-6 rounded-xl shadow">
-<h2 class="text-xl font-bold mb-4">Select Audit Month</h2>
-<div id="monthButtons" class="grid grid-cols-3 md:grid-cols-6 gap-3"></div>
-</section>
-
-<!-- ================= AUDIT TABLE ================= -->
-<section id="auditPage" class="page bg-white p-6 rounded-xl shadow">
-<h2 class="text-xl font-bold mb-4">
-Audit – <span id="auditMonth"></span> (<span id="auditYear"></span>)
-</h2>
-
-<div class="flex gap-2 mb-3">
-<button onclick="addAuditRow()" class="bg-indigo-600 text-white px-3 py-1 rounded">Add Row</button>
-<button onclick="saveAudit()" class="bg-green-600 text-white px-3 py-1 rounded">Save</button>
-</div>
-
-<table class="w-full border text-sm">
-<thead class="bg-gray-100">
-<tr>
-<th>#</th>
-<th>Bus No</th>
-<th>Revenue</th>
-<th>Expense</th>
-<th>Profit</th>
-</tr>
-</thead>
+<section id="audit" class="page">
+<h2 class="text-xl font-bold mb-2">Audit</h2>
+<button onclick="openAudit('January')" class="border px-3 py-1">January</button>
+<table class="mt-4 w-full border">
+<thead><tr><th>Bus</th><th>Revenue</th><th>Expense</th></tr></thead>
 <tbody id="auditBody"></tbody>
 </table>
+<button onclick="saveAudit()" class="bg-green-600 text-white px-3 py-1 mt-2">Save</button>
 </section>
-
-<!-- ================= PAYROLL ================= -->
-<section id="payrollSelect" class="page bg-white p-6 rounded-xl shadow">
-<h2 class="text-xl font-bold mb-4">Payroll (Coming Next)</h2>
-<p class="text-gray-500">Payroll module can be plugged here safely.</p>
-</section>
-
-</div>
+</main>
 
 <script>
-/* ================= FIREBASE ================= */
 firebase.initializeApp({
   apiKey: "AIzaSyBQrSN31bs0dqpyZVT_IeGktPEy7rMrqcQ",
   databaseURL: "https://yaswanth-fleet-default-rtdb.firebaseio.com"
 });
 const db = firebase.database();
 
-/* ================= GLOBAL STATE ================= */
+const YEARS = [2025,2026,2027];
 let CURRENT_YEAR = 2026;
 let CURRENT_MONTH = "";
 let IS_ADMIN = false;
-const YEARS = [2025, 2026, 2027];
-const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-/* ================= INIT ================= */
 window.onload = () => {
-  initYears();
-  initMonths();
-  showPage("home");
+  initYearSelector();
+  showPage('home');
 };
 
-/* ================= UI ================= */
-function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
-  document.getElementById(id).style.display = "block";
-}
-
-function initYears() {
-  const sel = document.getElementById("yearSelector");
+function initYearSelector(){
+  const sel = document.getElementById('yearSelector');
   sel.innerHTML = "";
-  YEARS.forEach(y => {
-    const o = document.createElement("option");
-    o.value = y;
-    o.text = y;
-    if (y === CURRENT_YEAR) o.selected = true;
+  YEARS.forEach(y=>{
+    const o=document.createElement('option');
+    o.value=y;o.text=y;
+    if(y===CURRENT_YEAR) o.selected=true;
     sel.appendChild(o);
   });
 }
 
-function initMonths() {
-  const box = document.getElementById("monthButtons");
-  MONTHS.forEach(m => {
-    const b = document.createElement("button");
-    b.innerText = m;
-    b.className = "border rounded p-2";
-    b.onclick = () => openAudit(m);
-    box.appendChild(b);
-  });
-}
-
-/* ================= ADMIN ================= */
-function adminLogin() {
-  const pin = prompt("Enter Admin PIN");
-  if (pin === "1234") {
-    IS_ADMIN = true;
-    alert("Admin mode enabled");
-  } else {
-    alert("Wrong PIN");
-  }
-}
-
-function changeYear(y) {
+function changeYear(y){
   CURRENT_YEAR = Number(y);
-  showPage("home");
+  showPage('home');
 }
 
-/* ================= AUDIT ================= */
-function openAudit(month) {
+function adminLogin(){
+  const pin = prompt("Enter Admin PIN");
+  if(pin==="1234"){
+    IS_ADMIN=true;
+    alert("Admin enabled");
+  } else alert("Wrong PIN");
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+
+function openAudit(month){
   CURRENT_MONTH = month;
-  document.getElementById("auditMonth").innerText = month;
-  document.getElementById("auditYear").innerText = CURRENT_YEAR;
   loadAudit();
-  showPage("auditPage");
+  showPage('audit');
 }
 
-function loadAudit() {
-  db.ref(`auditData/${CURRENT_YEAR}/${CURRENT_MONTH}`)
-    .once("value")
-    .then(snap => {
-      const data = snap.val() || [];
-      renderAudit(Array.isArray(data) ? data : Object.values(data));
+function loadAudit(){
+  db.ref(`auditData/${CURRENT_YEAR}/${CURRENT_MONTH}`).once('value').then(s=>{
+    const data=s.val()||[];
+    const arr=Array.isArray(data)?data:Object.values(data);
+    const body=document.getElementById('auditBody');
+    body.innerHTML="";
+    (arr.length?arr:[{}]).forEach(r=>{
+      body.innerHTML+=`<tr>
+      <td contenteditable="${IS_ADMIN}">${r.bus||""}</td>
+      <td contenteditable="${IS_ADMIN}">${r.revenue||""}</td>
+      <td contenteditable="${IS_ADMIN}">${r.expense||""}</td>
+      </tr>`;
     });
-}
-
-function renderAudit(data) {
-  const body = document.getElementById("auditBody");
-  body.innerHTML = "";
-
-  (data.length ? data : [{}]).forEach((r, i) => {
-    const rev = r.revenue || 0;
-    const exp = r.expense || 0;
-    const profit = rev - exp;
-
-    body.innerHTML += `
-    <tr>
-      <td>${i + 1}</td>
-      <td contenteditable="${IS_ADMIN}">${r.bus || ""}</td>
-      <td contenteditable="${IS_ADMIN}">${rev}</td>
-      <td contenteditable="${IS_ADMIN}">${exp}</td>
-      <td>${profit}</td>
-    </tr>`;
   });
 }
 
-function addAuditRow() {
-  if (!IS_ADMIN) return alert("Admin only");
-  renderAudit([...document.querySelectorAll("#auditBody tr")].map(tr => ({
-    bus: tr.cells[1].innerText,
-    revenue: Number(tr.cells[2].innerText) || 0,
-    expense: Number(tr.cells[3].innerText) || 0
-  })).concat({}));
-}
-
-function saveAudit() {
-  if (!IS_ADMIN) return alert("Admin only");
-
-  const data = [...document.querySelectorAll("#auditBody tr")].map(tr => ({
-    bus: tr.cells[1].innerText,
-    revenue: Number(tr.cells[2].innerText) || 0,
-    expense: Number(tr.cells[3].innerText) || 0
-  }));
-
+function saveAudit(){
+  if(!IS_ADMIN) return alert("Admin only");
+  const data=[];
+  document.querySelectorAll('#auditBody tr').forEach(tr=>{
+    data.push({
+      bus: tr.cells[0].innerText,
+      revenue: Number(tr.cells[1].innerText)||0,
+      expense: Number(tr.cells[2].innerText)||0
+    });
+  });
   db.ref(`auditData/${CURRENT_YEAR}/${CURRENT_MONTH}`).set(data);
-  alert("Saved successfully");
+  alert("Saved");
 }
 </script>
 
