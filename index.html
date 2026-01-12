@@ -3,109 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YASWANTH Fleet Audit</title>
+    <title>YASWANTH Fleet Audit - Rectified</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .page { display: none; animation: fadeIn 0.3s ease-out; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .page { display: none; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        [contenteditable="true"]:focus { background: #f1f5f9; outline: 2px solid #6366f1; border-radius: 4px; }
+        [contenteditable="true"] { padding: 4px; border-radius: 4px; transition: all 0.2s; }
+        [contenteditable="true"]:focus { background: #fff; outline: 2px solid #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.2); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="text-slate-800">
 
     <header class="bg-white border-b sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="container mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <h1 class="text-2xl font-black text-indigo-600">YASWANTH</h1>
-                <select id="year-select" onchange="changeYear(this.value)" class="bg-indigo-50 border-none rounded-lg px-3 py-1 font-bold text-indigo-700 cursor-pointer">
+                <span class="text-2xl font-black text-indigo-600 tracking-tighter">YASWANTH</span>
+                <select id="year-select" onchange="updateYear(this.value)" class="bg-slate-100 border-none rounded-lg font-bold text-indigo-700 px-3 py-1">
                     <option value="2025">2025</option>
                     <option value="2026" selected>2026</option>
                 </select>
             </div>
-            <nav class="flex gap-6 font-semibold">
+            <nav class="flex gap-6 font-bold text-slate-500">
                 <button onclick="showPage('home')" class="hover:text-indigo-600">Home</button>
-                <button onclick="showPage('bus-wise-audit')" class="hover:text-indigo-600">Reports</button>
+                <button onclick="showPage('reports-page')" class="hover:text-indigo-600">Reports</button>
             </nav>
         </div>
     </header>
 
-    <div class="container mx-auto p-6">
+    <div class="container mx-auto p-4 md:p-8">
+        
         <main id="home" class="page block">
-            <div class="text-center my-10">
-                <h2 class="text-4xl font-extrabold tracking-tight">Fleet Dashboard <span id="display-year">2026</span></h2>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition cursor-pointer" onclick="openSelector('audit')">
-                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-4 text-indigo-600">📊</div>
+            <h2 class="text-3xl font-black mb-8">Fleet Dashboard - <span class="yr-txt">2026</span></h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div onclick="openMonthGrid('audit')" class="bg-white p-8 rounded-3xl shadow-sm border hover:border-indigo-500 cursor-pointer transition-all">
+                    <div class="text-3xl mb-4">📊</div>
                     <h3 class="text-xl font-bold">Monthly Audit</h3>
-                    <p class="text-slate-500">Revenue & Expenses</p>
+                    <p class="text-slate-400 text-sm">Revenue vs Expenses</p>
                 </div>
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition cursor-pointer" onclick="openSelector('diesel')">
-                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 text-purple-600">⛽</div>
+                <div onclick="openMonthGrid('diesel')" class="bg-white p-8 rounded-3xl shadow-sm border hover:border-purple-500 cursor-pointer transition-all">
+                    <div class="text-3xl mb-4">⛽</div>
                     <h3 class="text-xl font-bold">Diesel Audit</h3>
-                    <p class="text-slate-500">Fuel Management</p>
+                    <p class="text-slate-400 text-sm">Daily Fuel Consumption</p>
                 </div>
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition cursor-pointer" onclick="openSelector('payroll')">
-                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4 text-amber-600">💰</div>
+                <div onclick="openMonthGrid('payroll')" class="bg-white p-8 rounded-3xl shadow-sm border hover:border-amber-500 cursor-pointer transition-all">
+                    <div class="text-3xl mb-4">💰</div>
                     <h3 class="text-xl font-bold">Payroll</h3>
-                    <p class="text-slate-500">Driver Salaries</p>
+                    <p class="text-slate-400 text-sm">Driver Settlements</p>
                 </div>
             </div>
         </main>
 
-        <section id="selector-page" class="page bg-white p-10 rounded-3xl shadow-sm border">
-            <button onclick="showPage('home')" class="text-indigo-600 font-bold mb-6">← Back to Home</button>
-            <h2 id="selector-title" class="text-3xl font-black mb-8 capitalize">Select Month</h2>
-            <div id="month-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+        <section id="grid-page" class="page">
+            <button onclick="showPage('home')" class="mb-6 font-bold text-indigo-600">← Back</button>
+            <h2 id="grid-title" class="text-3xl font-black mb-8 capitalize">Select Month</h2>
+            <div id="months-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
         </section>
 
-        <section id="audit-table-page" class="page bg-white p-8 rounded-3xl shadow-sm border">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-black"><span id="active-month-name"></span> <span class="year-val"></span></h2>
-                <div class="flex gap-4">
-                    <button onclick="addAuditRow()" class="bg-slate-100 px-5 py-2 rounded-xl font-bold">+ Add Bus</button>
-                    <button onclick="saveAuditData()" class="bg-indigo-600 text-white px-8 py-2 rounded-xl font-bold shadow-lg shadow-indigo-200">Save Changes</button>
+        <section id="audit-page" class="page bg-white p-6 rounded-3xl border shadow-sm">
+            <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+                <h2 class="text-2xl font-black"><span id="audit-month-label"></span> <span class="yr-txt"></span> Audit</h2>
+                <div class="flex gap-2">
+                    <button onclick="addAuditRow()" class="bg-slate-100 px-4 py-2 rounded-xl font-bold">+ Bus</button>
+                    <button onclick="saveAudit()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold">Save Data</button>
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="text-left text-slate-400 text-sm uppercase tracking-widest border-b">
-                            <th class="pb-4">Bus Number</th>
-                            <th class="pb-4">Revenue (Credit)</th>
-                            <th class="pb-4">Expenses</th>
-                            <th class="pb-4">Net Profit</th>
-                            <th class="pb-4 w-10"></th>
-                        </tr>
+                <table class="w-full text-left">
+                    <thead class="text-slate-400 text-xs uppercase tracking-widest border-b">
+                        <tr><th class="pb-4">Bus No</th><th class="pb-4">Revenue</th><th class="pb-4">Expense</th><th class="pb-4">Net</th><th class="pb-4 w-10"></th></tr>
                     </thead>
                     <tbody id="audit-tbody"></tbody>
-                    <tfoot id="audit-tfoot" class="bg-slate-50 font-black"></tfoot>
                 </table>
             </div>
         </section>
 
-        <section id="bus-wise-audit" class="page bg-white p-8 rounded-3xl shadow-sm border">
-            <h2 class="text-3xl font-black mb-10 text-center">Annual Performance Summary (<span class="year-val"></span>)</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <div class="p-6 border rounded-2xl">
-                    <h4 class="font-bold mb-4 text-center">Net Profit by Bus</h4>
-                    <canvas id="chart-profit"></canvas>
-                </div>
-                <div class="p-6 border rounded-2xl">
-                    <h4 class="font-bold mb-4 text-center">Revenue Distribution</h4>
-                    <canvas id="chart-revenue"></canvas>
-                </div>
+        <section id="diesel-page" class="page bg-white p-6 rounded-3xl border shadow-sm">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black">Diesel Log: <span id="diesel-month-label"></span></h2>
+                <button onclick="saveDiesel()" class="bg-purple-600 text-white px-6 py-2 rounded-xl font-bold">Save Log</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs border-collapse" id="diesel-table"></table>
             </div>
         </section>
+
+        <section id="reports-page" class="page">
+            <h2 class="text-3xl font-black mb-8 text-center">Fleet Analysis <span class="yr-txt"></span></h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-3xl border shadow-sm"><canvas id="p-chart"></canvas></div>
+                <div class="bg-white p-6 rounded-3xl border shadow-sm"><canvas id="r-chart"></canvas></div>
+            </div>
+        </section>
+
     </div>
 
     <script>
-        // FIREBASE INITIALIZATION
+        // FIREBASE SETUP
         const firebaseConfig = {
             apiKey: "AIzaSyBQrSN31bs0dqpyZVT_IeGktPEy7rMrqcQ",
             authDomain: "yaswanth-fleet.firebaseapp.com",
@@ -116,147 +113,169 @@
         firebase.initializeApp(firebaseConfig);
         const rtdb = firebase.database();
 
-        let selYear = "2026";
-        let selMonth = "";
-        let selType = "";
+        let currentYear = "2026";
+        let currentMonth = "";
+        let currentMode = ""; // audit, diesel, payroll
         const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        const dieselBuses = ['9721', '9722', '9932', '9935', '9937', '9938', '4680', '4681', '4319', '4320'];
 
-        // NAVIGATION
+        // NAVIGATION LOGIC
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
             document.getElementById(id).style.display = 'block';
-            if(id === 'bus-wise-audit') renderCharts();
-            document.querySelectorAll('.year-val').forEach(el => el.textContent = selYear);
+            if(id === 'reports-page') initReports();
         }
 
-        function changeYear(val) {
-            selYear = val;
-            document.getElementById('display-year').textContent = val;
+        function updateYear(val) {
+            currentYear = val;
+            document.querySelectorAll('.yr-txt').forEach(el => el.textContent = val);
         }
 
-        function openSelector(type) {
-            selType = type;
-            document.getElementById('selector-title').innerText = type + " Audit selection";
-            const grid = document.getElementById('month-grid');
-            grid.innerHTML = months.map(m => `
-                <button onclick="handleMonthClick('${m}')" class="p-6 bg-slate-50 rounded-2xl border hover:border-indigo-600 font-bold text-lg transition-all">
+        function openMonthGrid(mode) {
+            currentMode = mode;
+            document.getElementById('grid-title').innerText = mode + " Selection";
+            const container = document.getElementById('months-container');
+            container.innerHTML = months.map(m => `
+                <button onclick="handleMonthSelection('${m}')" class="bg-white p-6 rounded-2xl border font-bold hover:border-indigo-600 transition">
                     ${m}
                 </button>
             `).join('');
-            showPage('selector-page');
+            showPage('grid-page');
         }
 
-        function handleMonthClick(m) {
-            selMonth = m;
-            if(selType === 'audit') loadAuditData(m);
-            // Add similar handlers for diesel and payroll here
+        function handleMonthSelection(m) {
+            currentMonth = m;
+            if(currentMode === 'audit') loadAudit(m);
+            if(currentMode === 'diesel') loadDiesel(m);
+            // if(currentMode === 'payroll') loadPayroll(m);
         }
 
-        // AUDIT DATA LOGIC
-        async function loadAuditData(m) {
-            document.getElementById('active-month-name').innerText = m;
-            // TARGETING STRUCTURE: auditData/YEAR/MONTH
-            const snapshot = await rtdb.ref(`auditData/${selYear}/${m}`).once('value');
-            const data = snapshot.val() || [];
-            renderAuditTable(Array.isArray(data) ? data : Object.values(data));
-            showPage('audit-table-page');
-        }
-
-        function renderAuditTable(data) {
+        // MONTHLY AUDIT LOGIC
+        async function loadAudit(m) {
+            document.getElementById('audit-month-label').innerText = m;
+            const snap = await rtdb.ref(`auditData/${currentYear}/${m}`).once('value');
+            const data = snap.val() || [];
+            const rows = Array.isArray(data) ? data : Object.values(data);
+            
             const tbody = document.getElementById('audit-tbody');
-            tbody.innerHTML = (data.length ? data : [{busNumber:'', revenue:0, expense:0}]).map((row, i) => `
+            tbody.innerHTML = (rows.length ? rows : [{busNumber:'', revenue:0, expense:0}]).map(row => `
                 <tr class="border-b">
                     <td class="py-4 font-bold" contenteditable="true">${row.busNumber || ''}</td>
-                    <td class="py-4 text-green-600 font-semibold" contenteditable="true" onblur="calcTotals()">${(row.revenue || 0).toLocaleString()}</td>
-                    <td class="py-4 text-red-600 font-semibold" contenteditable="true" onblur="calcTotals()">${(row.expense || 0).toLocaleString()}</td>
-                    <td class="py-4 font-black net-cell">0</td>
-                    <td class="py-4 text-right"><button onclick="this.parentElement.parentElement.remove(); calcTotals()" class="text-slate-300 hover:text-red-500">✕</button></td>
+                    <td class="py-4 text-green-600 font-bold" contenteditable="true" onblur="calcAudit()">${(row.revenue || 0).toLocaleString()}</td>
+                    <td class="py-4 text-red-600 font-bold" contenteditable="true" onblur="calcAudit()">${(row.expense || 0).toLocaleString()}</td>
+                    <td class="py-4 font-black net-val">0</td>
+                    <td class="py-4"><button onclick="this.parentElement.parentElement.remove(); calcAudit()" class="text-slate-300 hover:text-red-500">✕</button></td>
                 </tr>
             `).join('');
-            calcTotals();
+            calcAudit();
+            showPage('audit-page');
         }
 
-        function addAuditRow() {
-            const tbody = document.getElementById('audit-tbody');
-            const tr = document.createElement('tr');
-            tr.className = "border-b";
-            tr.innerHTML = `<td class="py-4 font-bold" contenteditable="true"></td><td class="py-4 text-green-600 font-semibold" contenteditable="true" onblur="calcTotals()">0</td><td class="py-4 text-red-600 font-semibold" contenteditable="true" onblur="calcTotals()">0</td><td class="py-4 font-black net-cell">0</td><td class="py-4 text-right"><button onclick="this.parentElement.parentElement.remove(); calcTotals()" class="text-slate-300 hover:text-red-500">✕</button></td>`;
-            tbody.appendChild(tr);
-        }
-
-        function calcTotals() {
-            let tRev = 0, tExp = 0;
+        function calcAudit() {
             document.querySelectorAll('#audit-tbody tr').forEach(tr => {
                 const r = parseFloat(tr.cells[1].innerText.replace(/,/g,'')) || 0;
                 const e = parseFloat(tr.cells[2].innerText.replace(/,/g,'')) || 0;
-                tRev += r; tExp += e;
-                tr.cells[3].innerText = "₹" + (r - e).toLocaleString();
-                tr.cells[3].style.color = (r - e) >= 0 ? "#4f46e5" : "#ef4444";
+                const n = r - e;
+                tr.cells[3].innerText = "₹" + n.toLocaleString();
+                tr.cells[3].style.color = n >= 0 ? "#4f46e5" : "#ef4444";
             });
-            document.getElementById('audit-tfoot').innerHTML = `
-                <tr>
-                    <td class="py-4">TOTAL FLEET</td>
-                    <td class="py-4 text-green-600">₹${tRev.toLocaleString()}</td>
-                    <td class="py-4 text-red-600">₹${tExp.toLocaleString()}</td>
-                    <td class="py-4 text-indigo-600">₹${(tRev - tExp).toLocaleString()}</td>
-                    <td></td>
-                </tr>
-            `;
         }
 
-        async function saveAuditData() {
+        async function saveAudit() {
             const data = [];
             document.querySelectorAll('#audit-tbody tr').forEach(tr => {
                 const bus = tr.cells[0].innerText.trim();
-                if(bus) {
-                    data.push({
-                        busNumber: bus,
-                        revenue: parseFloat(tr.cells[1].innerText.replace(/,/g,'')) || 0,
-                        expense: parseFloat(tr.cells[2].innerText.replace(/,/g,'')) || 0
-                    });
-                }
+                if(bus) data.push({
+                    busNumber: bus,
+                    revenue: parseFloat(tr.cells[1].innerText.replace(/,/g,'')) || 0,
+                    expense: parseFloat(tr.cells[2].innerText.replace(/,/g,'')) || 0
+                });
             });
-            await rtdb.ref(`auditData/${selYear}/${selMonth}`).set(data);
-            alert(`Data for ${selMonth} ${selYear} saved successfully!`);
+            await rtdb.ref(`auditData/${currentYear}/${currentMonth}`).set(data);
+            alert("Audit saved to " + currentYear);
         }
 
-        // CHARTS LOGIC
+        function addAuditRow() {
+            const tr = document.createElement('tr');
+            tr.className = "border-b";
+            tr.innerHTML = `<td class="py-4 font-bold" contenteditable="true"></td><td class="py-4 text-green-600 font-bold" contenteditable="true" onblur="calcAudit()">0</td><td class="py-4 text-red-600 font-bold" contenteditable="true" onblur="calcAudit()">0</td><td class="py-4 font-black net-val">0</td><td class="py-4"><button onclick="this.parentElement.parentElement.remove(); calcAudit()">✕</button></td>`;
+            document.getElementById('audit-tbody').appendChild(tr);
+        }
+
+        // DIESEL LOGIC
+        async function loadDiesel(m) {
+            document.getElementById('diesel-month-label').innerText = m + " " + currentYear;
+            const snap = await rtdb.ref(`dieselData/${currentYear}/${m}`).once('value');
+            const savedData = snap.val() || {};
+
+            const days = new Date(currentYear, months.indexOf(m) + 1, 0).getDate();
+            const table = document.getElementById('diesel-table');
+            
+            let html = `<thead><tr class="bg-slate-50"><th class="p-2 border sticky left-0 bg-slate-50">Bus</th>`;
+            for(let d=1; d<=days; d++) html += `<th class="p-1 border text-center">${d}</th>`;
+            html += `<th class="p-2 border">Total</th></tr></thead><tbody>`;
+
+            dieselBuses.forEach(bus => {
+                html += `<tr><td class="p-2 border font-bold sticky left-0 bg-white">${bus}</td>`;
+                let rowSum = 0;
+                for(let d=1; d<=days; d++) {
+                    const val = savedData[bus] ? (savedData[bus][d] || '') : '';
+                    html += `<td contenteditable="true" class="p-1 border text-center d-input" data-bus="${bus}" data-day="${d}" onblur="sumDiesel()">${val}</td>`;
+                }
+                html += `<td class="p-2 border font-black bus-sum">0</td></tr>`;
+            });
+            table.innerHTML = html + `</tbody>`;
+            sumDiesel();
+            showPage('diesel-page');
+        }
+
+        function sumDiesel() {
+            document.querySelectorAll('#diesel-table tbody tr').forEach(tr => {
+                let sum = 0;
+                tr.querySelectorAll('.d-input').forEach(td => sum += parseFloat(td.innerText) || 0);
+                tr.querySelector('.bus-sum').innerText = sum.toLocaleString();
+            });
+        }
+
+        async function saveDiesel() {
+            const data = {};
+            document.querySelectorAll('.d-input').forEach(td => {
+                const b = td.dataset.bus, d = td.dataset.day, v = parseFloat(td.innerText) || 0;
+                if(v > 0) {
+                    if(!data[b]) data[b] = {};
+                    data[b][d] = v;
+                }
+            });
+            await rtdb.ref(`dieselData/${currentYear}/${currentMonth}`).set(data);
+            alert("Diesel log saved!");
+        }
+
+        // REPORTS
         let chartInstances = {};
-        async function renderCharts() {
-            const snap = await rtdb.ref(`auditData/${selYear}`).once('value');
+        async function initReports() {
+            const snap = await rtdb.ref(`auditData/${currentYear}`).once('value');
             const yearData = snap.val() || {};
-            const busStats = {};
+            const busAgg = {};
 
             Object.values(yearData).forEach(m => {
-                const rows = Array.isArray(m) ? m : Object.values(m);
-                rows.forEach(r => {
-                    if(!busStats[r.busNumber]) busStats[r.busNumber] = { r:0, e:0 };
-                    busStats[r.busNumber].r += r.revenue;
-                    busStats[r.busNumber].e += r.expense;
+                const entries = Array.isArray(m) ? m : Object.values(m);
+                entries.forEach(e => {
+                    if(!busAgg[e.busNumber]) busAgg[e.busNumber] = { r:0, e:0 };
+                    busAgg[e.busNumber].r += e.revenue;
+                    busAgg[e.busNumber].e += e.expense;
                 });
             });
 
-            const labels = Object.keys(busStats);
-            const profitData = labels.map(l => busStats[l].r - busStats[l].e);
-            const revenueData = labels.map(l => busStats[l].r);
+            const labels = Object.keys(busAgg);
+            const profits = labels.map(l => busAgg[l].r - busAgg[l].e);
 
             if(chartInstances.p) chartInstances.p.destroy();
-            chartInstances.p = new Chart(document.getElementById('chart-profit'), {
-                type: 'bar',
-                data: { labels, datasets: [{ label: 'Annual Net Profit', data: profitData, backgroundColor: '#6366f1', borderRadius: 8 }] },
-                options: { responsive: true }
-            });
-
-            if(chartInstances.r) chartInstances.r.destroy();
-            chartInstances.r = new Chart(document.getElementById('chart-revenue'), {
-                type: 'doughnut',
-                data: { labels, datasets: [{ data: revenueData, backgroundColor: ['#4f46e5', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'] }] },
-                options: { responsive: true }
+            chartInstances.p = new Chart(document.getElementById('p-chart'), {
+                type: 'bar', data: { labels, datasets: [{ label: 'Annual Net Profit', data: profits, backgroundColor: '#6366f1' }] }
             });
         }
 
-        // Startup
-        window.onload = () => showPage('home');
+        updateYear("2026");
     </script>
 </body>
 </html>
