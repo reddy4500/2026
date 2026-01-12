@@ -4,14 +4,314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YASWANTH Fleet Audit</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com">
+// ===== YEAR HANDLING =====
+function initYearSelector() {
+  const sel = document.getElementById("yearSelector");
+  AVAILABLE_YEARS.forEach(y => {
+    const o = document.createElement("option");
+    o.value = y; o.textContent = y;
+    if (y === CURRENT_YEAR) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+function changeYear(y) {
+  CURRENT_YEAR = parseInt(y);
+  alert("Switched to year " + CURRENT_YEAR);
+  showPage('home');
+}
+
+// ===== ADMIN PIN LOGIN =====
+function adminLogin() {
+  const pin = prompt("Enter Admin PIN:");
+  if (pin === ADMIN_PIN) {
+    IS_ADMIN = true;
+    alert("Admin mode enabled");
+  } else {
+    alert("Wrong PIN");
+  }
+  applyEditPermissions();
+}
+
+function applyEditPermissions() {
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = IS_ADMIN;
+  });
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.innerText.includes("Save")) {
+      btn.disabled = !IS_ADMIN;
+      btn.classList.toggle("opacity-50", !IS_ADMIN);
+    }
+  });
+}
+
+// ===== AUTO-COPY PREVIOUS MONTH (AUDIT) =====
+async function autoCopyPreviousMonth(month) {
+  const order = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const idx = order.indexOf(month);
+  if (idx <= 0) return [];
+  const prev = order[idx-1];
+
+  const snap = await database.ref(`auditData/${CURRENT_YEAR}/${prev}`).once('value');
+  const prevData = snap.val();
+  if (!prevData) return [];
+
+  return (Array.isArray(prevData) ? prevData : Object.values(prevData))
+    .map(r => ({ busNumber: r.busNumber, revenue: 0, expense: 0 }));
+}
+
+// ===== YEARLY CSV EXPORT =====
+async function exportAuditYearCSV() {
+  let csv = "Month,Bus,Revenue,Expense,Profit\n";
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  for (const m of months) {
+    const snap = await database.ref(`auditData/${CURRENT_YEAR}/${m}`).once('value');
+    const data = snap.val();
+    if (!data) continue;
+    (Array.isArray(data)?data:Object.values(data)).forEach(r => {
+      csv += `${m},${r.busNumber},${r.revenue},${r.expense},${r.revenue-r.expense}\n`;
+    });
+  }
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Audit_${CURRENT_YEAR}.csv`;
+  a.click();
+}
+
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+// ===== YEAR HANDLING =====
+function initYearSelector() {
+  const sel = document.getElementById("yearSelector");
+  AVAILABLE_YEARS.forEach(y => {
+    const o = document.createElement("option");
+    o.value = y; o.textContent = y;
+    if (y === CURRENT_YEAR) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+function changeYear(y) {
+  CURRENT_YEAR = parseInt(y);
+  alert("Switched to year " + CURRENT_YEAR);
+  showPage('home');
+}
+
+// ===== ADMIN PIN LOGIN =====
+function adminLogin() {
+  const pin = prompt("Enter Admin PIN:");
+  if (pin === ADMIN_PIN) {
+    IS_ADMIN = true;
+    alert("Admin mode enabled");
+  } else {
+    alert("Wrong PIN");
+  }
+  applyEditPermissions();
+}
+
+function applyEditPermissions() {
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = IS_ADMIN;
+  });
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.innerText.includes("Save")) {
+      btn.disabled = !IS_ADMIN;
+      btn.classList.toggle("opacity-50", !IS_ADMIN);
+    }
+  });
+}
+
+// ===== AUTO-COPY PREVIOUS MONTH (AUDIT) =====
+async function autoCopyPreviousMonth(month) {
+  const order = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const idx = order.indexOf(month);
+  if (idx <= 0) return [];
+  const prev = order[idx-1];
+
+  const snap = await database.ref(`auditData/${CURRENT_YEAR}/${prev}`).once('value');
+  const prevData = snap.val();
+  if (!prevData) return [];
+
+  return (Array.isArray(prevData) ? prevData : Object.values(prevData))
+    .map(r => ({ busNumber: r.busNumber, revenue: 0, expense: 0 }));
+}
+
+// ===== YEARLY CSV EXPORT =====
+async function exportAuditYearCSV() {
+  let csv = "Month,Bus,Revenue,Expense,Profit\n";
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  for (const m of months) {
+    const snap = await database.ref(`auditData/${CURRENT_YEAR}/${m}`).once('value');
+    const data = snap.val();
+    if (!data) continue;
+    (Array.isArray(data)?data:Object.values(data)).forEach(r => {
+      csv += `${m},${r.busNumber},${r.revenue},${r.expense},${r.revenue-r.expense}\n`;
+    });
+  }
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Audit_${CURRENT_YEAR}.csv`;
+  a.click();
+}
+
+</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js">
+// ===== YEAR HANDLING =====
+function initYearSelector() {
+  const sel = document.getElementById("yearSelector");
+  AVAILABLE_YEARS.forEach(y => {
+    const o = document.createElement("option");
+    o.value = y; o.textContent = y;
+    if (y === CURRENT_YEAR) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+function changeYear(y) {
+  CURRENT_YEAR = parseInt(y);
+  alert("Switched to year " + CURRENT_YEAR);
+  showPage('home');
+}
+
+// ===== ADMIN PIN LOGIN =====
+function adminLogin() {
+  const pin = prompt("Enter Admin PIN:");
+  if (pin === ADMIN_PIN) {
+    IS_ADMIN = true;
+    alert("Admin mode enabled");
+  } else {
+    alert("Wrong PIN");
+  }
+  applyEditPermissions();
+}
+
+function applyEditPermissions() {
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = IS_ADMIN;
+  });
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.innerText.includes("Save")) {
+      btn.disabled = !IS_ADMIN;
+      btn.classList.toggle("opacity-50", !IS_ADMIN);
+    }
+  });
+}
+
+// ===== AUTO-COPY PREVIOUS MONTH (AUDIT) =====
+async function autoCopyPreviousMonth(month) {
+  const order = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const idx = order.indexOf(month);
+  if (idx <= 0) return [];
+  const prev = order[idx-1];
+
+  const snap = await database.ref(`auditData/${CURRENT_YEAR}/${prev}`).once('value');
+  const prevData = snap.val();
+  if (!prevData) return [];
+
+  return (Array.isArray(prevData) ? prevData : Object.values(prevData))
+    .map(r => ({ busNumber: r.busNumber, revenue: 0, expense: 0 }));
+}
+
+// ===== YEARLY CSV EXPORT =====
+async function exportAuditYearCSV() {
+  let csv = "Month,Bus,Revenue,Expense,Profit\n";
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  for (const m of months) {
+    const snap = await database.ref(`auditData/${CURRENT_YEAR}/${m}`).once('value');
+    const data = snap.val();
+    if (!data) continue;
+    (Array.isArray(data)?data:Object.values(data)).forEach(r => {
+      csv += `${m},${r.busNumber},${r.revenue},${r.expense},${r.revenue-r.expense}\n`;
+    });
+  }
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Audit_${CURRENT_YEAR}.csv`;
+  a.click();
+}
+
+</script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js">
+// ===== YEAR HANDLING =====
+function initYearSelector() {
+  const sel = document.getElementById("yearSelector");
+  AVAILABLE_YEARS.forEach(y => {
+    const o = document.createElement("option");
+    o.value = y; o.textContent = y;
+    if (y === CURRENT_YEAR) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+function changeYear(y) {
+  CURRENT_YEAR = parseInt(y);
+  alert("Switched to year " + CURRENT_YEAR);
+  showPage('home');
+}
+
+// ===== ADMIN PIN LOGIN =====
+function adminLogin() {
+  const pin = prompt("Enter Admin PIN:");
+  if (pin === ADMIN_PIN) {
+    IS_ADMIN = true;
+    alert("Admin mode enabled");
+  } else {
+    alert("Wrong PIN");
+  }
+  applyEditPermissions();
+}
+
+function applyEditPermissions() {
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = IS_ADMIN;
+  });
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.innerText.includes("Save")) {
+      btn.disabled = !IS_ADMIN;
+      btn.classList.toggle("opacity-50", !IS_ADMIN);
+    }
+  });
+}
+
+// ===== AUTO-COPY PREVIOUS MONTH (AUDIT) =====
+async function autoCopyPreviousMonth(month) {
+  const order = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const idx = order.indexOf(month);
+  if (idx <= 0) return [];
+  const prev = order[idx-1];
+
+  const snap = await database.ref(`auditData/${CURRENT_YEAR}/${prev}`).once('value');
+  const prevData = snap.val();
+  if (!prevData) return [];
+
+  return (Array.isArray(prevData) ? prevData : Object.values(prevData))
+    .map(r => ({ busNumber: r.busNumber, revenue: 0, expense: 0 }));
+}
+
+// ===== YEARLY CSV EXPORT =====
+async function exportAuditYearCSV() {
+  let csv = "Month,Bus,Revenue,Expense,Profit\n";
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  for (const m of months) {
+    const snap = await database.ref(`auditData/${CURRENT_YEAR}/${m}`).once('value');
+    const data = snap.val();
+    if (!data) continue;
+    (Array.isArray(data)?data:Object.values(data)).forEach(r => {
+      csv += `${m},${r.busNumber},${r.revenue},${r.expense},${r.revenue-r.expense}\n`;
+    });
+  }
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Audit_${CURRENT_YEAR}.csv`;
+  a.click();
+}
+
+</script>
 
     <style>
         body {
@@ -57,6 +357,14 @@
 
         <header class="flex justify-between items-center mb-8 bg-white/80 backdrop-blur-lg fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] max-w-7xl z-50 p-4 md:p-6 rounded-xl shadow-lg shadow-slate-900/5">
             <div class="flex items-center gap-2">
+<div class="flex items-center gap-3">
+  <select id="yearSelector" class="border rounded px-2 py-1 text-sm"
+          onchange="changeYear(this.value)"></select>
+  <button onclick="adminLogin()" class="bg-slate-800 text-white px-3 py-1 rounded text-sm">
+    Admin
+  </button>
+</div>
+
                 <img src="logo.png" alt="Yaswanth Logo" class="h-12">
             </div>
             <nav class="hidden md:flex space-x-8">
@@ -427,9 +735,17 @@
 
         // 2. Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+initYearSelector();
         const database = firebase.database();
 
         // --- Global Variables ---
+
+// ===== GLOBAL CONFIG =====
+let CURRENT_YEAR = 2026;
+const AVAILABLE_YEARS = [2025, 2026, 2027];
+const ADMIN_PIN = "1234"; // CHANGE THIS
+let IS_ADMIN = false;
+
         const pages = document.querySelectorAll('.page');
         let profitLossChartInstance = null;
         let revenuePieChartInstance = null;
@@ -458,7 +774,12 @@
             document.getElementById('audit-file-month').textContent = month;
             try {
                 const snapshot = await database.ref(`auditData/${month}`).once('value');
-                const monthData = snapshot.val() || [];
+                
+let monthData = snapshot.val();
+if (!monthData) {
+  monthData = await autoCopyPreviousMonth(month);
+}
+
                 // Firebase returns an object for arrays, so we must convert it if needed
                 const dataArray = Array.isArray(monthData) ? monthData : Object.values(monthData);
                 buildTableWithData(dataArray);
@@ -1132,7 +1453,82 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
         window.onload = () => showPage('home');
-    </script>
+    
+// ===== YEAR HANDLING =====
+function initYearSelector() {
+  const sel = document.getElementById("yearSelector");
+  AVAILABLE_YEARS.forEach(y => {
+    const o = document.createElement("option");
+    o.value = y; o.textContent = y;
+    if (y === CURRENT_YEAR) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+function changeYear(y) {
+  CURRENT_YEAR = parseInt(y);
+  alert("Switched to year " + CURRENT_YEAR);
+  showPage('home');
+}
+
+// ===== ADMIN PIN LOGIN =====
+function adminLogin() {
+  const pin = prompt("Enter Admin PIN:");
+  if (pin === ADMIN_PIN) {
+    IS_ADMIN = true;
+    alert("Admin mode enabled");
+  } else {
+    alert("Wrong PIN");
+  }
+  applyEditPermissions();
+}
+
+function applyEditPermissions() {
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = IS_ADMIN;
+  });
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.innerText.includes("Save")) {
+      btn.disabled = !IS_ADMIN;
+      btn.classList.toggle("opacity-50", !IS_ADMIN);
+    }
+  });
+}
+
+// ===== AUTO-COPY PREVIOUS MONTH (AUDIT) =====
+async function autoCopyPreviousMonth(month) {
+  const order = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const idx = order.indexOf(month);
+  if (idx <= 0) return [];
+  const prev = order[idx-1];
+
+  const snap = await database.ref(`auditData/${CURRENT_YEAR}/${prev}`).once('value');
+  const prevData = snap.val();
+  if (!prevData) return [];
+
+  return (Array.isArray(prevData) ? prevData : Object.values(prevData))
+    .map(r => ({ busNumber: r.busNumber, revenue: 0, expense: 0 }));
+}
+
+// ===== YEARLY CSV EXPORT =====
+async function exportAuditYearCSV() {
+  let csv = "Month,Bus,Revenue,Expense,Profit\n";
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  for (const m of months) {
+    const snap = await database.ref(`auditData/${CURRENT_YEAR}/${m}`).once('value');
+    const data = snap.val();
+    if (!data) continue;
+    (Array.isArray(data)?data:Object.values(data)).forEach(r => {
+      csv += `${m},${r.busNumber},${r.revenue},${r.expense},${r.revenue-r.expense}\n`;
+    });
+  }
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Audit_${CURRENT_YEAR}.csv`;
+  a.click();
+}
+
+</script>
 
 </body>
 </html>
