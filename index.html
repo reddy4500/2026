@@ -56,7 +56,17 @@
     <div class="container mx-auto p-7 md:p-14 max-w-7xl">
 
         <header class="flex justify-between items-center mb-8 bg-white/80 backdrop-blur-lg fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] max-w-7xl z-50 p-4 md:p-6 rounded-xl shadow-lg shadow-slate-900/5">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-4">
+                <select id="yearSelector"
+                        class="border border-slate-300 rounded px-2 py-1 text-sm bg-white"
+                        onchange="changeYear(this.value)">
+                </select>
+
+                <button onclick="adminLogin()"
+                        class="bg-slate-800 text-white px-3 py-1 rounded text-sm">
+                    Admin
+                </button>
+
                 <img src="logo.png" alt="Yaswanth Logo" class="h-12">
             </div>
             <nav class="hidden md:flex space-x-8">
@@ -427,9 +437,20 @@
 
         // 2. Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+
+document.addEventListener("DOMContentLoaded", () => {
+    initYearSelector();
+    showPage('home');
+    applyEditPermissions();
+});
         const database = firebase.database();
 
         // --- Global Variables ---
+let CURRENT_YEAR = 2026;
+const AVAILABLE_YEARS = [2025, 2026, 2027];
+const ADMIN_PIN = "1234"; // CHANGE THIS
+let IS_ADMIN = false;
+
         const pages = document.querySelectorAll('.page');
         let profitLossChartInstance = null;
         let revenuePieChartInstance = null;
@@ -1136,3 +1157,47 @@
 
 </body>
 </html>
+
+<script>
+function initYearSelector() {
+    const sel = document.getElementById("yearSelector");
+    if (!sel) return;
+    sel.innerHTML = "";
+    AVAILABLE_YEARS.forEach(y => {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        if (y === CURRENT_YEAR) opt.selected = true;
+        sel.appendChild(opt);
+    });
+}
+
+function changeYear(y) {
+    CURRENT_YEAR = parseInt(y);
+    alert("Switched to year " + CURRENT_YEAR);
+    showPage('home');
+}
+
+function adminLogin() {
+    const pin = prompt("Enter Admin PIN:");
+    if (pin === ADMIN_PIN) {
+        IS_ADMIN = true;
+        alert("Admin mode enabled");
+    } else {
+        alert("Wrong PIN");
+    }
+    applyEditPermissions();
+}
+
+function applyEditPermissions() {
+    document.querySelectorAll('[contenteditable]').forEach(el => {
+        el.contentEditable = IS_ADMIN;
+    });
+    document.querySelectorAll('button').forEach(btn => {
+        if (btn.innerText.includes("Save")) {
+            btn.disabled = !IS_ADMIN;
+            btn.classList.toggle("opacity-50", !IS_ADMIN);
+        }
+    });
+}
+</script>
