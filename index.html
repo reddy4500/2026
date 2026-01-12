@@ -14,41 +14,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .page {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        [contenteditable="true"] {
-            cursor: pointer;
-            outline: none;
-            background-color: rgba(239, 246, 255, 0.5);
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
-        [contenteditable="true"]:focus {
-            background-color: rgba(224, 231, 255, 1);
-            box-shadow: 0 0 0 2px #4f46e5;
-        }
-        [contenteditable=true]:empty:before {
-            content: attr(data-placeholder);
-            color: #94a3b8;
-            font-style: italic;
-        }
-        .yaswanth-title {
-            background: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .page { display: none; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        [contenteditable="true"] { cursor: pointer; outline: none; background-color: rgba(239, 246, 255, 0.5); padding: 2px 4px; border-radius: 4px; }
+        [contenteditable="true"]:focus { background-color: rgba(224, 231, 255, 1); box-shadow: 0 0 0 2px #4f46e5; }
+        [contenteditable=true]:empty:before { content: attr(data-placeholder); color: #94a3b8; font-style: italic; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-indigo-200 text-slate-800">
@@ -56,359 +27,190 @@
     <div class="container mx-auto p-7 md:p-14 max-w-7xl">
 
         <header class="flex justify-between items-center mb-8 bg-white/80 backdrop-blur-lg fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] max-w-7xl z-50 p-4 md:p-6 rounded-xl shadow-lg shadow-slate-900/5">
-            <div class="flex items-center gap-2">
-                <img src="logo.png" alt="Yaswanth Logo" class="h-12">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-black text-indigo-600 tracking-tight">YASWANTH</h1>
+                <select id="year-selector" onchange="changeYear(this.value)" class="bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2 font-bold">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                </select>
             </div>
             <nav class="hidden md:flex space-x-8">
                 <a href="#" onclick="showPage('home')" class="text-slate-600 hover:text-indigo-500 font-medium transition-colors">Home</a>
                 <a href="#" onclick="showPage('bus-wise-audit')" class="text-slate-600 hover:text-indigo-500 font-medium transition-colors">Fleet Reports</a>
                 <a href="#" onclick="showPage('payroll-selection')" class="text-slate-600 hover:text-indigo-500 font-medium transition-colors">Payroll</a>
             </nav>
-            <button id="mobile-menu-button" class="md-hidden text-slate-600 hover:text-indigo-500">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            <button id="mobile-menu-button" class="md:hidden text-slate-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
             </button>
         </header>
 
         <div id="mobile-menu" class="hidden md:hidden bg-slate-50 rounded-xl shadow-lg mb-8 p-4 fixed top-24 left-4 right-4 z-40">
-            <a href="#" onclick="showPage('home')" class="block py-2 text-slate-600 hover:text-indigo-500 rounded-md px-3">Home</a>
-            <a href="#" onclick="showPage('bus-wise-audit')" class="block py-2 text-slate-600 hover:text-indigo-500 rounded-md px-3">Fleet Reports</a>
-            <a href="#" onclick="showPage('payroll-selection')" class="block py-2 text-slate-600 hover:text-indigo-500 rounded-md px-3">Payroll</a>
+            <a href="#" onclick="showPage('home')" class="block py-2">Home</a>
+            <a href="#" onclick="showPage('bus-wise-audit')" class="block py-2">Fleet Reports</a>
+            <a href="#" onclick="showPage('payroll-selection')" class="block py-2">Payroll</a>
         </div>
 
         <div class="h-24"></div>
 
         <main id="home" class="page">
             <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold mb-2 text-slate-900">Dashboard</h2>
-                <p class="text-slate-500 text-lg">Select an option to begin.</p>
+                <h2 class="text-4xl font-bold mb-2 text-slate-900">Dashboard <span id="dash-year" class="text-indigo-500">2026</span></h2>
+                <p class="text-slate-500 text-lg">Manage fleet finances and payroll.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="group bg-slate-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer" onclick="showPage('monthly-audit-selection')">
-                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 text-indigo-600 mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+                <div class="group bg-slate-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onclick="showPage('monthly-audit-selection')">
+                    <div class="h-16 w-16 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </div>
-                    <h3 class="text-2xl font-semibold mb-3 text-slate-800">Monthly Audit Entry</h3>
-                    <p class="text-slate-500 mb-6">Enter financial data for each month and bus.</p>
-                    <span class="font-semibold text-indigo-600 group-hover:underline">
-                        Go to Data Entry &rarr;
-                    </span>
+                    <h3 class="text-2xl font-semibold mb-3">Monthly Audit</h3>
+                    <p class="text-slate-500">Revenue and expenses entry.</p>
                 </div>
-                 <div class="group bg-slate-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer" onclick="showPage('diesel-selection')">
-                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-purple-100 text-purple-600 mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3zm3.146 5.146L8 10.001V15l1.001-1-1.147-1.146a1 1 0 010-1.414l-1.414-1.414a1 1 0 010-1.414L8.586 8l-2.44-2.44A.5.5 0 016.5 5H4v2.5a.5.5 0 01.146.354z" clip-rule="evenodd" />
-                        </svg>
+                <div class="group bg-slate-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onclick="showPage('diesel-selection')">
+                    <div class="h-16 w-16 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     </div>
-                    <h3 class="text-2xl font-semibold mb-3 text-slate-800">Diesel Audit</h3>
-                    <p class="text-slate-500 mb-6">Track daily diesel consumption for the fleet.</p>
-                     <span class="font-semibold text-purple-600 group-hover:underline">
-                        Go to Diesel Log &rarr;
-                    </span>
+                    <h3 class="text-2xl font-semibold mb-3">Diesel Audit</h3>
+                    <p class="text-slate-500">Daily fuel consumption logs.</p>
                 </div>
-                <div class="group bg-slate-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer" onclick="showPage('bus-wise-audit')">
-                     <div class="flex items-center justify-center h-16 w-16 rounded-full bg-teal-100 text-teal-600 mb-6 group-hover:bg-teal-600 group-hover:text-white transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-                        </svg>
+                <div class="group bg-slate-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onclick="showPage('bus-wise-audit')">
+                    <div class="h-16 w-16 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center mb-6 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     </div>
-                    <h3 class="text-2xl font-semibold mb-3 text-slate-800">View Fleet Reports</h3>
-                    <p class="text-slate-500 mb-6">Analyze aggregated profit, loss, and revenue data.</p>
-                     <span class="font-semibold text-teal-600 group-hover:underline">
-                        Go to Reports &rarr;
-                    </span>
+                    <h3 class="text-2xl font-semibold mb-3">Fleet Reports</h3>
+                    <p class="text-slate-500">Aggregated performance analytics.</p>
                 </div>
-                <div class="group bg-slate-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer" onclick="showPage('payroll-selection')">
-                     <div class="flex items-center justify-center h-16 w-16 rounded-full bg-amber-100 text-amber-600 mb-6 group-hover:bg-amber-600 group-hover:text-white transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
+                <div class="group bg-slate-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onclick="showPage('payroll-selection')">
+                    <div class="h-16 w-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mb-6 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                     </div>
-                    <h3 class="text-2xl font-semibold mb-3 text-slate-800">Payroll</h3>
-                    <p class="text-slate-500 mb-6">Calculate and manage driver payments and deductions.</p>
-                     <span class="font-semibold text-amber-600 group-hover:underline">
-                        Go to Payroll &rarr;
-                    </span>
+                    <h3 class="text-2xl font-semibold mb-3">Payroll</h3>
+                    <p class="text-slate-500">Driver salary and deductions.</p>
                 </div>
             </div>
         </main>
 
         <section id="monthly-audit-selection" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
-            <div class="flex items-center mb-8">
-                <button onclick="showPage('home')" class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition-colors mr-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Back
-                </button>
-                <h2 class="text-3xl font-bold text-slate-900">Select Audit Period</h2>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <a href="#" onclick="showAuditFile('January')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">January</a>
-                <a href="#" onclick="showAuditFile('February')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">February</a>
-                <a href="#" onclick="showAuditFile('March')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">March</a>
-                <a href="#" onclick="showAuditFile('April')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">April</a>
-                <a href="#" onclick="showAuditFile('May')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">May</a>
-                <a href="#" onclick="showAuditFile('June')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">June</a>
-                <a href="#" onclick="showAuditFile('July')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">July</a>
-                <a href="#" onclick="showAuditFile('August')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">August</a>
-                <a href="#" onclick="showAuditFile('September')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">September</a>
-                <a href="#" onclick="showAuditFile('October')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">October</a>
-                <a href="#" onclick="showAuditFile('November')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">November</a>
-                <a href="#" onclick="showAuditFile('December')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-indigo-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">December</a>
-            </div>
+            <button onclick="showPage('home')" class="mb-6 text-indigo-600 flex items-center font-bold">← Back</button>
+            <h2 class="text-3xl font-bold mb-8">Monthly Audit (<span class="selected-year-text">2026</span>)</h2>
+            <div id="audit-months-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+        </section>
+
+        <section id="diesel-selection" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
+            <button onclick="showPage('home')" class="mb-6 text-indigo-600 flex items-center font-bold">← Back</button>
+            <h2 class="text-3xl font-bold mb-8">Diesel Audit (<span class="selected-year-text">2026</span>)</h2>
+            <div id="diesel-months-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+        </section>
+
+        <section id="payroll-selection" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
+            <button onclick="showPage('home')" class="mb-6 text-indigo-600 flex items-center font-bold">← Back</button>
+            <h2 class="text-3xl font-bold mb-8">Payroll (<span class="selected-year-text">2026</span>)</h2>
+            <div id="payroll-months-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
         </section>
 
         <section id="audit-file" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
-             <div class="flex items-center mb-1">
-                <button onclick="showPage('monthly-audit-selection')" class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition-colors mr-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Back
-                </button>
-                <h2 class="text-3xl font-bold text-slate-900">Audit File: <span id="audit-file-month"></span></h2>
-            </div>
-            <p class="text-sm text-slate-500 mb-6 ml-16">Click cells to edit. Totals are updated on blur. Click Save to persist changes.</p>
-            
-            <div class="flex justify-between items-center mb-4">
-                <button onclick="addRow()" class="flex items-center gap-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                    Add Row
-                </button>
-                <div class="flex gap-4">
-                     <button onclick="exportToCSV()" class="flex items-center gap-2 bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 4h3a1 1 0 000-2H4a1 1 0 000 2zM8 16a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1zM4 16a1 1 0 011-1h2a1 1 0 110 2H5a1 1 0 01-1-1z" /><path fill-rule="evenodd" d="M5 8a3 3 0 016 0v8a3 3 0 11-6 0V8zm3-1a1 1 0 00-1 1v8a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                        Export to CSV
-                    </button>
-                    <button onclick="saveTableData()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-sm font-semibold">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                        Save Changes
-                    </button>
+             <div class="flex justify-between items-center mb-6">
+                <button onclick="showPage('monthly-audit-selection')" class="text-indigo-600 font-bold">← Back</button>
+                <h2 class="text-2xl font-bold"><span id="audit-file-month"></span> <span class="selected-year-text">2026</span></h2>
+                <div class="flex gap-2">
+                    <button onclick="addRow()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm">+ Row</button>
+                    <button onclick="saveTableData()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">Save</button>
                 </div>
             </div>
-
             <div class="overflow-x-auto rounded-lg border">
                 <table class="min-w-full">
                     <thead class="bg-slate-100">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">S.No</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Bus Number</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Credited Money</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Expenses</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Money Left</th>
-                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase">S.No</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase">Bus No.</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase">Revenue</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase">Expenses</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase">Profit/Loss</th>
+                            <th class="px-4 py-3 text-center text-xs font-bold uppercase">Del</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-slate-50 divide-y divide-slate-200" id="audit-table-body"></tbody>
-                    <tfoot class="bg-slate-200 font-bold" id="audit-table-foot"></tfoot>
+                    <tbody id="audit-table-body" class="bg-white divide-y"></tbody>
+                    <tfoot id="audit-table-foot" class="bg-slate-200 font-bold"></tfoot>
                 </table>
-            </div>
-        </section>
-
-        <section id="diesel-selection" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
-            <div class="flex items-center mb-8">
-                <button onclick="showPage('home')" class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition-colors mr-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Back
-                </button>
-                <h2 class="text-3xl font-bold text-slate-900">Select Diesel Audit Month</h2>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <a href="#" onclick="showDieselFile('January')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">January</a>
-                <a href="#" onclick="showDieselFile('February')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">February</a>
-                <a href="#" onclick="showDieselFile('March')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">March</a>
-                <a href="#" onclick="showDieselFile('April')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">April</a>
-                <a href="#" onclick="showDieselFile('May')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">May</a>
-                <a href="#" onclick="showDieselFile('June')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">June</a>
-                <a href="#" onclick="showDieselFile('July')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">July</a>
-                <a href="#" onclick="showDieselFile('August')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">August</a>
-                <a href="#" onclick="showDieselFile('September')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">September</a>
-                <a href="#" onclick="showDieselFile('October')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">October</a>
-                <a href="#" onclick="showDieselFile('November')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">November</a>
-                <a href="#" onclick="showDieselFile('December')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-purple-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">December</a>
             </div>
         </section>
 
         <section id="diesel-file" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
-             <div class="flex items-center mb-1">
-                <button onclick="showPage('diesel-selection')" class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition-colors mr-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Back
-                </button>
-                <h2 class="text-3xl font-bold text-slate-900">Diesel Log: <span id="diesel-file-month"></span></h2>
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showPage('diesel-selection')" class="text-indigo-600 font-bold">← Back</button>
+                <h2 class="text-2xl font-bold">Diesel: <span id="diesel-file-month"></span> <span class="selected-year-text">2026</span></h2>
+                <button onclick="saveDieselData()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold">Save Changes</button>
             </div>
-            <p class="text-sm text-slate-500 mb-6 ml-16">Enter diesel amount in each cell. Totals are updated automatically.</p>
-            
-            <div class="flex justify-end items-center mb-4">
-                <div class="flex gap-4">
-                     <button onclick="exportDieselToCSV()" class="flex items-center gap-2 bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 4h3a1 1 0 000-2H4a1 1 0 000 2zM8 16a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1zM4 16a1 1 0 011-1h2a1 1 0 110 2H5a1 1 0 01-1-1z" /><path fill-rule="evenodd" d="M5 8a3 3 0 016 0v8a3 3 0 11-6 0V8zm3-1a1 1 0 00-1 1v8a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                        Export to CSV
-                    </button>
-                    <button onclick="saveDieselData()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-sm font-semibold">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                        Save Changes
-                    </button>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto rounded-lg border">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-slate-100 sticky top-0" id="diesel-table-head"></thead>
-                    <tbody class="bg-slate-50 divide-y divide-slate-200" id="diesel-table-body"></tbody>
-                    <tfoot class="bg-slate-200 font-bold sticky bottom-0" id="diesel-table-foot"></tfoot>
+            <div class="overflow-x-auto rounded-lg border max-h-[600px]">
+                <table class="min-w-full text-xs">
+                    <thead id="diesel-table-head" class="bg-slate-100 sticky top-0 z-20"></thead>
+                    <tbody id="diesel-table-body" class="bg-white divide-y"></tbody>
+                    <tfoot id="diesel-table-foot" class="bg-slate-200 font-bold sticky bottom-0 z-20"></tfoot>
                 </table>
             </div>
         </section>
 
-
         <section id="bus-wise-audit" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
-            <div class="flex items-center mb-6">
-                <button onclick="showPage('home')" class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition-colors mr-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Back
-                </button>
-                <h2 class="text-3xl font-bold text-slate-900">Aggregated Fleet Reports</h2>
-            </div>
-            
-            <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                 <div class="lg:col-span-2 bg-white p-6 rounded-lg border shadow-sm">
-                    <h3 class="text-xl font-semibold mb-4 text-center text-slate-700">Overall Profit vs. Loss by Bus</h3>
+            <button onclick="showPage('home')" class="mb-6 text-indigo-600 font-bold">← Back</button>
+            <h2 class="text-3xl font-bold mb-8">Annual Reports for <span class="selected-year-text">2026</span></h2>
+            <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white p-6 rounded-xl shadow-sm border">
+                    <h3 class="font-bold text-center mb-4">Bus Profit Performance</h3>
                     <canvas id="busProfitLossChart"></canvas>
                 </div>
-                <div class="lg:col-span-1 bg-white p-6 rounded-lg border shadow-sm">
-                     <h3 class="text-xl font-semibold mb-4 text-center text-slate-700">Total Revenue Share by Bus</h3>
-                     <canvas id="revenuePieChart"></canvas>
+                <div class="bg-white p-6 rounded-xl shadow-sm border">
+                    <h3 class="font-bold text-center mb-4">Revenue Share</h3>
+                    <canvas id="revenuePieChart"></canvas>
                 </div>
             </div>
-
-            <div id="bus-specific-analysis-section" class="hidden">
-                <hr class="my-10 border-slate-300">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-                    <h2 class="text-3xl font-bold text-slate-900 mb-4 sm:mb-0">Individual Bus Performance</h2>
+            <div id="bus-specific-analysis-section">
+                <div class="flex items-center gap-4 mb-6">
+                    <label class="font-bold">Specific Bus Analysis:</label>
+                    <select id="bus-selector" class="p-2 border rounded-lg"></select>
+                </div>
+                <div id="bus-details-container" class="hidden bg-white p-8 rounded-xl border shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label for="bus-selector" class="font-medium mr-2 text-slate-600">Select a Bus:</label>
-                        <select id="bus-selector" class="p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></select>
+                        <h3 class="text-2xl font-bold text-indigo-600 mb-4">Bus <span id="details-bus-number"></span></h3>
+                        <div class="space-y-2">
+                            <p class="flex justify-between border-b py-2"><span>Total Revenue:</span> <span id="details-total-revenue" class="font-bold"></span></p>
+                            <p class="flex justify-between border-b py-2"><span>Total Expenses:</span> <span id="details-total-expense" class="font-bold text-red-500"></span></p>
+                            <p class="flex justify-between border-b py-2 text-lg"><span>Net Profit:</span> <span id="details-net-profit" class="font-black"></span></p>
+                        </div>
                     </div>
+                    <canvas id="monthlyBusChart"></canvas>
                 </div>
-                <div id="bus-details-container" class="hidden grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
-                    <div class="xl:col-span-1 bg-white p-6 rounded-lg border shadow-sm flex flex-col gap-4">
-                        <h3 class="text-xl font-semibold mb-2 text-slate-800 border-b pb-2">Analysis for Bus: <span id="details-bus-number" class="text-indigo-600 font-bold"></span></h3>
-                        <div class="flex justify-between items-center bg-slate-100 p-3 rounded-md">
-                            <span class="font-semibold text-slate-600">Total Revenue:</span>
-                            <span id="details-total-revenue" class="font-bold text-green-600 text-lg"></span>
-                        </div>
-                         <div class="flex justify-between items-center bg-slate-100 p-3 rounded-md">
-                            <span class="font-semibold text-slate-600">Total Expenses:</span>
-                            <span id="details-total-expense" class="font-bold text-red-600 text-lg"></span>
-                        </div>
-                         <div class="flex justify-between items-center bg-slate-100 p-3 rounded-md">
-                            <span class="font-semibold text-slate-600">Net Profit:</span>
-                            <span id="details-net-profit" class="font-bold text-lg"></span>
-                        </div>
-                        <hr class="my-2">
-                         <div class="flex justify-between items-center bg-green-100 p-3 rounded-md border border-green-200">
-                            <span class="font-semibold text-green-800">Best Month:</span>
-                            <div>
-                                <span id="details-best-month" class="font-bold text-green-800"></span>
-                                <span id="details-best-profit" class="text-sm text-green-700 block text-right"></span>
-                            </div>
-                        </div>
-                         <div class="flex justify-between items-center bg-red-100 p-3 rounded-md border border-red-200">
-                            <span class="font-semibold text-red-800">Worst Month:</span>
-                            <div>
-                                <span id="details-worst-month" class="font-bold text-red-800"></span>
-                                <span id="details-worst-profit" class="text-sm text-red-700 block text-right"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="xl:col-span-2 bg-white p-6 rounded-lg border shadow-sm">
-                        <h3 class="text-xl font-semibold mb-4 text-center text-slate-700">Monthly Performance Trend</h3>
-                        <canvas id="monthlyBusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div id="no-charts-message" class="hidden text-center py-16">
-                <h3 class="text-2xl font-semibold text-slate-700">No Data Available</h3>
-                <p class="text-slate-500 mt-2">Please enter some data in the 'Monthly Audit Entry' section to generate reports.</p>
-            </div>
-        </section>
-        <section id="payroll-selection" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
-            <div class="flex items-center mb-8">
-                <button onclick="showPage('home')" class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition-colors mr-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Back
-                </button>
-                <h2 class="text-3xl font-bold text-slate-900">Select Payroll Month</h2>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                <a href="#" onclick="showPayrollFile('January')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">January</a>
-                <a href="#" onclick="showPayrollFile('February')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">February</a>
-                <a href="#" onclick="showPayrollFile('March')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">March</a>
-                <a href="#" onclick="showPayrollFile('April')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">April</a>
-                <a href="#" onclick="showPayrollFile('May')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">May</a>
-                <a href="#" onclick="showPayrollFile('June')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">June</a>
-                <a href="#" onclick="showPayrollFile('July')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">July</a>
-                <a href="#" onclick="showPayrollFile('August')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">August</a>
-                <a href="#" onclick="showPayrollFile('September')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">September</a>
-                <a href="#" onclick="showPayrollFile('October')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">October</a>
-                <a href="#" onclick="showPayrollFile('November')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">November</a>
-                <a href="#" onclick="showPayrollFile('December')" class="text-center font-medium p-4 bg-white shadow-sm border rounded-lg hover:bg-amber-500 hover:text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105">December</a>
             </div>
         </section>
 
         <section id="payroll-file" class="page bg-slate-50 p-8 rounded-2xl shadow-lg">
-             <div class="flex items-center mb-1">
-                <button onclick="showPage('payroll-selection')" class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition-colors mr-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                    Back
-                </button>
-                <h2 class="text-3xl font-bold text-slate-900">Payroll Report: <span id="payroll-file-month"></span></h2>
-            </div>
-            <p class="text-sm text-slate-500 mb-6 ml-16">Click editable cells to enter data. Calculated fields update automatically.</p>
-            
-            <div class="flex justify-between items-center mb-4">
-                <button onclick="addPayrollRow()" class="flex items-center gap-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                    Add Row
-                </button>
-                <div class="flex gap-4">
-                     <button onclick="exportPayrollToCSV()" class="flex items-center gap-2 bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 4h3a1 1 0 000-2H4a1 1 0 000 2zM8 16a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1zM4 16a1 1 0 011-1h2a1 1 0 110 2H5a1 1 0 01-1-1z" /><path fill-rule="evenodd" d="M5 8a3 3 0 016 0v8a3 3 0 11-6 0V8zm3-1a1 1 0 00-1 1v8a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                        Export to CSV
-                    </button>
-                    <button onclick="savePayrollData()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-sm font-semibold">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                        Save Changes
-                    </button>
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showPage('payroll-selection')" class="text-indigo-600 font-bold">← Back</button>
+                <h2 class="text-2xl font-bold">Payroll: <span id="payroll-file-month"></span> <span class="selected-year-text">2026</span></h2>
+                <div class="flex gap-2">
+                    <button onclick="addPayrollRow()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">+ Driver</button>
+                    <button onclick="savePayrollData()" class="bg-green-600 text-white px-4 py-2 rounded-lg">Save</button>
                 </div>
             </div>
-
             <div class="overflow-x-auto rounded-lg border">
-                <table class="min-w-full text-sm">
+                <table class="min-w-full text-xs">
                     <thead class="bg-slate-100">
                         <tr>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Vehicle No</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Opted KM</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Slab Rate</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-200/60">Amount Payable</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Insurance</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Oil Saved</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-200/60">Total Payable</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Income Tax</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Penalty</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Less Other (Oil)</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-200/60">Total Deduction</th>
-                            <th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider bg-indigo-100">Net Payable</th>
-                            <th class="p-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
+                            <th class="p-2 text-left">Driver</th><th class="p-2 text-left">Vehicle</th>
+                            <th class="p-2 text-left">KM</th><th class="p-2 text-left">Rate</th>
+                            <th class="p-2 text-left bg-slate-200">Base</th>
+                            <th class="p-2 text-left">Insur.</th><th class="p-2 text-left">Oil</th>
+                            <th class="p-2 text-left bg-slate-200">Gross</th>
+                            <th class="p-2 text-left text-red-500">Tax</th><th class="p-2 text-left text-red-500">Pen.</th>
+                            <th class="p-2 text-left bg-indigo-100">Net</th><th class="p-2"></th>
                         </tr>
                     </thead>
-                    <tbody class="bg-slate-50 divide-y divide-slate-200" id="payroll-table-body"></tbody>
-                    <tfoot class="bg-slate-200 font-bold" id="payroll-table-foot"></tfoot>
+                    <tbody id="payroll-table-body" class="bg-white"></tbody>
+                    <tfoot id="payroll-table-foot" class="bg-slate-200 font-bold"></tfoot>
                 </table>
             </div>
         </section>
+
     </div>
 
     <script>
@@ -420,741 +222,344 @@
             projectId: "yaswanth-fleet",
             storageBucket: "yaswanth-fleet.appspot.com",
             messagingSenderId: "44710091269",
-            appId: "1:44710091269:web:6bffc1ab51aa52723e9a6c",
-            measurementId: "G-LLY5VJN3N6"
+            appId: "1:44710091269:web:6bffc1ab51aa52723e9a6c"
         };
-        // End of Firebase Configuration
-
-        // 2. Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-// ===== YEAR STATE (FIXED) =====
-let CURRENT_YEAR = 2026;
-
-function initYearSelector() {
-  const selector = document.getElementById("yearSelector");
-  if (!selector) return;
-  selector.innerHTML = "";
-  [2025, 2026, 2027].forEach(y => {
-    const opt = document.createElement("option");
-    opt.value = y;
-    opt.textContent = y;
-    if (y === CURRENT_YEAR) opt.selected = true;
-    selector.appendChild(opt);
-  });
-}
-
-function changeYear(year) {
-  CURRENT_YEAR = Number(year);
-  alert("Year changed to " + CURRENT_YEAR);
-}
-
-
-        // --- Global Variables ---
-        const pages = document.querySelectorAll('.page');
-        let profitLossChartInstance = null;
-        let revenuePieChartInstance = null;
-        let monthlyBusChartInstance = null;
-        const DIESEL_BUS_NUMBERS = ['9721', '9722', '9932', '9935', '9937', '9938', '4680', '4681', '4319', '4320'];
-
+        // 2. State
+        let SELECTED_YEAR = "2026";
+        const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const DIESEL_BUSES = ['9721', '9722', '9932', '9935', '9937', '9938', '4680', '4681', '4319', '4320'];
         
-        // --- Page Navigation ---
-        function showPage(pageId) {
-            pages.forEach(page => page.style.display = 'none');
-            const activePage = document.getElementById(pageId);
-            if (activePage) activePage.style.display = 'block';
-            
-            document.getElementById('mobile-menu').classList.add('hidden');
+        // Chart instances
+        let charts = { profit: null, pie: null, trend: null };
 
-            if (pageId === 'bus-wise-audit') {
-                createOrUpdateCharts();
+        // 3. Year Handling
+        function changeYear(year) {
+            SELECTED_YEAR = year;
+            document.querySelectorAll('.selected-year-text').forEach(el => el.textContent = year);
+            document.getElementById('dash-year').textContent = year;
+            // Refresh current view if needed
+            const visiblePage = Array.from(document.querySelectorAll('.page')).find(p => p.style.display === 'block');
+            if (visiblePage && visiblePage.id === 'bus-wise-audit') createOrUpdateCharts();
+        }
+
+        // 4. Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById(pageId).style.display = 'block';
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+            if (pageId === 'bus-wise-audit') createOrUpdateCharts();
+        }
+
+        // 5. Grid Building
+        function buildGrids() {
+            const grids = {
+                'audit-months-grid': 'showAuditFile',
+                'diesel-months-grid': 'showDieselFile',
+                'payroll-months-grid': 'showPayrollFile'
+            };
+            
+            for (const [id, func] of Object.entries(grids)) {
+                const el = document.getElementById(id);
+                el.innerHTML = MONTHS.map(m => `
+                    <button onclick="${func}('${m}')" class="p-4 bg-white border rounded-xl hover:bg-indigo-600 hover:text-white transition-all font-medium shadow-sm">
+                        ${m}
+                    </button>
+                `).join('');
             }
         }
 
-        // ======================================================= //
-        // AUDIT FUNCTIONS (MODIFIED FOR FIREBASE)                 //
-        // ======================================================= //
-
+        // 6. Audit Data Logic
         async function showAuditFile(month) {
             document.getElementById('audit-file-month').textContent = month;
-            try {
-                const snapshot = await database.ref(`auditData/${month}`).once('value');
-                const monthData = snapshot.val() || [];
-                // Firebase returns an object for arrays, so we must convert it if needed
-                const dataArray = Array.isArray(monthData) ? monthData : Object.values(monthData);
-                buildTableWithData(dataArray);
-                showPage('audit-file');
-            } catch (error) {
-                console.error("Could not fetch audit data: ", error);
-                alert("Error fetching data. Check console for details.");
-            }
+            const snapshot = await database.ref(`auditData/${SELECTED_YEAR}/${month}`).once('value');
+            const data = snapshot.val() || [];
+            renderAuditTable(Array.isArray(data) ? data : Object.values(data));
+            showPage('audit-file');
         }
-        
+
+        function renderAuditTable(data) {
+            const tbody = document.getElementById('audit-table-body');
+            tbody.innerHTML = '';
+            const rows = data.length > 0 ? data : [{busNumber:'', revenue:0, expense:0}];
+            rows.forEach((d, i) => addAuditRowHtml(d, i + 1));
+            updateAuditTotals();
+        }
+
+        function addRow() {
+            const nextIdx = document.getElementById('audit-table-body').children.length + 1;
+            addAuditRowHtml({busNumber:'', revenue:0, expense:0}, nextIdx);
+        }
+
+        function addAuditRowHtml(d, i) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-4">${i}</td>
+                <td class="p-2"><div contenteditable="true" class="bus-no-cell font-bold" data-placeholder="Bus No">${d.busNumber || ''}</div></td>
+                <td class="p-2"><div contenteditable="true" class="rev-cell text-green-600" onblur="formatMoney(this); updateAuditTotals()">${(d.revenue || 0).toLocaleString()}</div></td>
+                <td class="p-2"><div contenteditable="true" class="exp-cell text-red-600" onblur="formatMoney(this); updateAuditTotals()">${(d.expense || 0).toLocaleString()}</div></td>
+                <td class="p-4 font-bold profit-cell"></td>
+                <td class="p-4 text-center"><button onclick="this.parentElement.parentElement.remove(); updateAuditTotals()" class="text-red-500">×</button></td>
+            `;
+            document.getElementById('audit-table-body').appendChild(tr);
+        }
+
+        function updateAuditTotals() {
+            let trrev = 0, trexp = 0;
+            document.querySelectorAll('#audit-table-body tr').forEach(row => {
+                const r = parseNum(row.querySelector('.rev-cell').textContent);
+                const e = parseNum(row.querySelector('.exp-cell').textContent);
+                const p = r - e;
+                trrev += r; trexp += e;
+                const pc = row.querySelector('.profit-cell');
+                pc.textContent = "₹" + p.toLocaleString();
+                pc.className = `p-4 font-bold profit-cell ${p >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            });
+            document.getElementById('audit-table-foot').innerHTML = `
+                <tr><td colspan="2" class="p-4">TOTAL</td><td class="p-4">₹${trrev.toLocaleString()}</td><td class="p-4 text-red-600">₹${trexp.toLocaleString()}</td><td class="p-4">₹${(trrev-trexp).toLocaleString()}</td><td></td></tr>
+            `;
+        }
+
         async function saveTableData() {
             const month = document.getElementById('audit-file-month').textContent;
-            if (!month) return alert('Error: No month selected.');
-            const monthData = [];
+            const data = [];
             document.querySelectorAll('#audit-table-body tr').forEach(row => {
-                const busNumber = row.querySelector('.bus-number-cell').innerText.trim().toUpperCase();
-                const revenue = parseCurrency(row.querySelector('.revenue-cell').innerText);
-                const expense = parseCurrency(row.querySelector('.expense-cell').innerText);
-                if (busNumber || revenue || expense) {
-                    monthData.push({ busNumber, revenue, expense });
+                const busNumber = row.querySelector('.bus-no-cell').textContent.trim();
+                if(busNumber) {
+                    data.push({
+                        busNumber,
+                        revenue: parseNum(row.querySelector('.rev-cell').textContent),
+                        expense: parseNum(row.querySelector('.exp-cell').textContent)
+                    });
                 }
             });
-            
-            try {
-                await database.ref(`auditData/${month}`).set(monthData);
-                alert(`Audit data for ${month} saved successfully!`);
-            } catch (error) {
-                console.error("Error saving audit data: ", error);
-                alert("Error saving data to Firebase. See console for details.");
-            }
+            await database.ref(`auditData/${SELECTED_YEAR}/${month}`).set(data);
+            alert("Saved successfully!");
         }
-        
-        // ======================================================= //
-        // NEW DIESEL AUDIT FUNCTIONS                            //
-        // ======================================================= //
+
+        // 7. Diesel Logic
         async function showDieselFile(month) {
             document.getElementById('diesel-file-month').textContent = month;
-            try {
-                const snapshot = await database.ref(`dieselData/${month}`).once('value');
-                const dieselData = snapshot.val() || {};
-                buildDieselTable(month, dieselData);
-                showPage('diesel-file');
-            } catch (error) {
-                console.error("Could not fetch diesel data: ", error);
-                alert("Error fetching data. Check console for details.");
-            }
-        }
+            const snapshot = await database.ref(`dieselData/${SELECTED_YEAR}/${month}`).once('value');
+            const data = snapshot.val() || {};
+            
+            const days = new Date(SELECTED_YEAR, MONTHS.indexOf(month) + 1, 0).getDate();
+            const head = document.getElementById('diesel-table-head');
+            const body = document.getElementById('diesel-table-body');
 
-        function buildDieselTable(month, data) {
-            const year = new Date().getFullYear();
-            const monthIndex = new Date(Date.parse(month + " 1, 2012")).getMonth();
-            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+            let hRow = '<tr><th class="p-2 sticky left-0 bg-slate-100">Bus</th>';
+            for(let i=1; i<=days; i++) hRow += `<th class="p-1">${i}</th>`;
+            hRow += '<th>Total</th></tr>';
+            head.innerHTML = hRow;
 
-            const tableHead = document.getElementById('diesel-table-head');
-            const tableBody = document.getElementById('diesel-table-body');
-            const tableFoot = document.getElementById('diesel-table-foot');
-
-            // Clear previous table
-            tableHead.innerHTML = '';
-            tableBody.innerHTML = '';
-            tableFoot.innerHTML = '';
-
-            // Build Header
-            let headerRow = '<tr><th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider sticky left-0 bg-slate-100 z-10">Bus No.</th>';
-            for (let i = 1; i <= daysInMonth; i++) {
-                headerRow += `<th class="p-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">${i}</th>`;
-            }
-            headerRow += '<th class="p-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider sticky right-0 bg-slate-100 z-10">Bus Total</th></tr>';
-            tableHead.innerHTML = headerRow;
-
-            // Build Body
-            DIESEL_BUS_NUMBERS.forEach(bus => {
-                let bodyRow = `<tr data-bus="${bus}">`;
-                bodyRow += `<td class="p-2 whitespace-nowrap font-semibold text-slate-700 sticky left-0 bg-slate-50">${bus}</td>`;
-                for (let i = 1; i <= daysInMonth; i++) {
-                    const value = data[bus] && data[bus][i] ? data[bus][i] : '';
-                    bodyRow += `<td class="p-1 whitespace-nowrap text-center text-slate-800 diesel-input-cell" contenteditable="true" data-day="${i}" onblur="updateDieselTotals()">${value}</td>`;
+            body.innerHTML = DIESEL_BUSES.map(bus => {
+                let bRow = `<tr><td class="p-2 font-bold sticky left-0 bg-white">${bus}</td>`;
+                for(let i=1; i<=days; i++) {
+                    const val = (data[bus] && data[bus][i]) ? data[bus][i] : '';
+                    bRow += `<td contenteditable="true" class="p-1 border d-cell" data-bus="${bus}" data-day="${i}" onblur="calcDiesel()">${val}</td>`;
                 }
-                bodyRow += `<td class="p-2 whitespace-nowrap font-bold text-indigo-700 sticky right-0 bg-slate-100 bus-total-cell">0</td>`;
-                bodyRow += '</tr>';
-                tableBody.innerHTML += bodyRow;
-            });
-
-            // Build Footer
-            let footerRow = '<tr><td class="p-3 font-semibold text-slate-800 sticky left-0 bg-slate-200">Daily Total</td>';
-            for (let i = 1; i <= daysInMonth; i++) {
-                footerRow += `<td class="p-3 whitespace-nowrap font-bold text-center day-total-cell" data-day-total="${i}">0</td>`;
-            }
-            footerRow += `<td class="p-3 whitespace-nowrap font-extrabold text-lg text-indigo-800 sticky right-0 bg-slate-300 grand-total-cell">0</td></tr>`;
-            tableFoot.innerHTML = footerRow;
-
-            updateDieselTotals(); // Calculate initial totals
+                bRow += `<td class="p-2 font-bold bus-total">0</td></tr>`;
+                return bRow;
+            }).join('');
+            
+            calcDiesel();
+            showPage('diesel-file');
         }
-        
-        function updateDieselTotals() {
-            let grandTotal = 0;
-            const daysInMonth = document.querySelectorAll('#diesel-table-head th').length - 2;
 
-            // Row totals (Bus-wise)
+        function calcDiesel() {
             document.querySelectorAll('#diesel-table-body tr').forEach(row => {
-                let rowTotal = 0;
-                row.querySelectorAll('.diesel-input-cell').forEach(cell => {
-                    rowTotal += parseCurrency(cell.innerText);
-                });
-                row.querySelector('.bus-total-cell').innerText = rowTotal.toLocaleString();
-                grandTotal += rowTotal;
+                let total = 0;
+                row.querySelectorAll('.d-cell').forEach(c => total += parseNum(c.textContent));
+                row.querySelector('.bus-total').textContent = total.toLocaleString();
             });
-
-            // Column totals (Day-wise)
-            for (let i = 1; i <= daysInMonth; i++) {
-                let colTotal = 0;
-                document.querySelectorAll(`#diesel-table-body .diesel-input-cell[data-day="${i}"]`).forEach(cell => {
-                    colTotal += parseCurrency(cell.innerText);
-                });
-                document.querySelector(`#diesel-table-foot .day-total-cell[data-day-total="${i}"]`).innerText = colTotal.toLocaleString();
-            }
-
-            // Grand total
-            document.querySelector('.grand-total-cell').innerText = grandTotal.toLocaleString();
         }
 
         async function saveDieselData() {
             const month = document.getElementById('diesel-file-month').textContent;
-            if (!month) return alert('Error: No diesel audit month selected.');
-
-            const monthData = {};
-            document.querySelectorAll('#diesel-table-body tr').forEach(row => {
-                const busNumber = row.dataset.bus;
-                monthData[busNumber] = {};
-                row.querySelectorAll('.diesel-input-cell').forEach(cell => {
-                    const day = cell.dataset.day;
-                    const value = parseCurrency(cell.innerText);
-                    if (value > 0) {
-                        monthData[busNumber][day] = value;
-                    }
-                });
-            });
-
-            try {
-                await database.ref(`dieselData/${month}`).set(monthData);
-                alert(`Diesel data for ${month} saved successfully!`);
-            } catch (error) {
-                console.error("Error saving diesel data: ", error);
-                alert("Error saving data to Firebase. See console for details.");
-            }
-        }
-        
-        function exportDieselToCSV() {
-            const month = document.getElementById('diesel-file-month').textContent;
-            let csvContent = "data:text/csv;charset=utf-8,";
-            
-            // Headers
-            const headers = Array.from(document.querySelectorAll('#diesel-table-head th')).map(th => th.innerText);
-            csvContent += headers.join(',') + '\n';
-
-            // Body
-            document.querySelectorAll('#diesel-table-body tr').forEach(row => {
-                const rowData = Array.from(row.querySelectorAll('td')).map(td => `"${td.innerText}"`);
-                csvContent += rowData.join(',') + '\n';
-            });
-            
-            // Footer
-            const footers = Array.from(document.querySelectorAll('#diesel-table-foot td')).map(td => `"${td.innerText}"`);
-            csvContent += footers.join(',') + '\n';
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `diesel_audit_${month.toLowerCase()}_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // ======================================================= //
-        // REPORTING & CHART FUNCTIONS (HEAVILY MODIFIED)          //
-        // ======================================================= //
-
-        async function createOrUpdateCharts() {
-            try {
-                const snapshot = await database.ref('auditData').once('value');
-                const db = snapshot.val() || {};
-                
-                const hasData = Object.keys(db).length > 0 && Object.values(db).some(month => month && (Array.isArray(month) ? month.length > 0 : Object.keys(month).length > 0));
-
-                // Show/hide relevant containers based on data presence
-                document.getElementById('charts-container').style.display = hasData ? 'grid' : 'none';
-                document.getElementById('bus-specific-analysis-section').style.display = hasData ? 'block' : 'none';
-                document.getElementById('no-charts-message').style.display = hasData ? 'none' : 'block';
-                document.getElementById('bus-details-container').classList.add('hidden'); // Hide details on load
-
-                if (!hasData) return;
-                
-                // --- 1. Detailed Data Aggregation (per bus, per month) ---
-                const busData = {};
-                const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                
-                monthOrder.forEach(month => {
-                    if (db[month]) {
-                        const monthData = Array.isArray(db[month]) ? db[month] : Object.values(db[month]);
-                        monthData.forEach(entry => {
-                            const bus = entry.busNumber.toUpperCase();
-                            if (!bus) return;
-                            if (!busData[bus]) {
-                                busData[bus] = { monthlyData: {} };
-                            }
-                            busData[bus].monthlyData[month] = {
-                                revenue: entry.revenue || 0,
-                                expense: entry.expense || 0,
-                                profit: (entry.revenue || 0) - (entry.expense || 0)
-                            };
-                        });
-                    }
-                });
-
-                // --- 2. Create Aggregated Totals for Overview Charts ---
-                const aggregatedTotals = {};
-                Object.keys(busData).forEach(bus => {
-                    aggregatedTotals[bus] = { revenue: 0, profit: 0, loss: 0 };
-                    Object.values(busData[bus].monthlyData).forEach(data => {
-                        aggregatedTotals[bus].revenue += data.revenue;
-                        if (data.profit >= 0) {
-                            aggregatedTotals[bus].profit += data.profit;
-                        } else {
-                            aggregatedTotals[bus].loss += data.profit;
-                        }
-                    });
-                });
-                const labels = Object.keys(aggregatedTotals).sort();
-                const profitDataset = labels.map(bus => aggregatedTotals[bus].profit);
-                const lossDataset = labels.map(bus => aggregatedTotals[bus].loss);
-                const revenueDataset = labels.map(bus => aggregatedTotals[bus].revenue);
-                
-                // --- 3. Render Charts and Dropdown ---
-                createBusProfitLossChart(labels, profitDataset, lossDataset);
-                createRevenuePieChart(labels, revenueDataset);
-                populateBusSelector(Object.keys(busData).sort(), busData);
-
-
-            } catch (error) {
-                console.error("Could not create charts: ", error);
-                document.getElementById('charts-container').style.display = 'none';
-                document.getElementById('no-charts-message').style.display = 'block';
-            }
-        }
-
-        function populateBusSelector(busList, allData) {
-            const selector = document.getElementById('bus-selector');
-            selector.innerHTML = '<option value="">-- Select a Bus --</option>'; // Reset
-            busList.forEach(bus => {
-                const option = document.createElement('option');
-                option.value = bus;
-                option.textContent = bus;
-                selector.appendChild(option);
-            });
-            selector.onchange = () => displayBusDetails(selector.value, allData);
-        }
-
-        function displayBusDetails(busNumber, allData) {
-            const container = document.getElementById('bus-details-container');
-            if (!busNumber) {
-                container.classList.add('hidden');
-                return;
-            }
-            container.classList.remove('hidden');
-
-            const data = allData[busNumber].monthlyData;
-            let totalRevenue = 0, totalExpense = 0;
-            let bestProfit = -Infinity, bestMonth = 'N/A';
-            let worstProfit = Infinity, worstMonth = 'N/A';
-
-            Object.entries(data).forEach(([month, values]) => {
-                totalRevenue += values.revenue;
-                totalExpense += values.expense;
-                if (values.profit > bestProfit) {
-                    bestProfit = values.profit;
-                    bestMonth = month;
-                }
-                if (values.profit < worstProfit) {
-                    worstProfit = values.profit;
-                    worstMonth = month;
+            const data = {};
+            document.querySelectorAll('.d-cell').forEach(c => {
+                const bus = c.dataset.bus, day = c.dataset.day, val = parseNum(c.textContent);
+                if(val > 0) {
+                    if(!data[bus]) data[bus] = {};
+                    data[bus][day] = val;
                 }
             });
-            const netProfit = totalRevenue - totalExpense;
-
-            // Populate KPI elements
-            document.getElementById('details-bus-number').textContent = busNumber;
-            document.getElementById('details-total-revenue').textContent = '₹' + totalRevenue.toLocaleString();
-            document.getElementById('details-total-expense').textContent = '₹' + totalExpense.toLocaleString();
-            const netProfitEl = document.getElementById('details-net-profit');
-            netProfitEl.textContent = '₹' + netProfit.toLocaleString();
-            netProfitEl.className = `font-bold text-lg ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`;
-
-            document.getElementById('details-best-month').textContent = bestMonth;
-            document.getElementById('details-best-profit').textContent = `(₹${bestProfit.toLocaleString()})`;
-            document.getElementById('details-worst-month').textContent = worstMonth;
-            document.getElementById('details-worst-profit').textContent = `(₹${worstProfit.toLocaleString()})`;
-
-            // Prepare data for the monthly chart
-            const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const chartLabels = monthOrder.filter(month => data[month] !== undefined);
-            const revenueValues = chartLabels.map(month => data[month].revenue);
-            const expenseValues = chartLabels.map(month => data[month].expense);
-            const profitValues = chartLabels.map(month => data[month].profit);
-
-            createMonthlyBusChart(chartLabels, revenueValues, expenseValues, profitValues);
+            await database.ref(`dieselData/${SELECTED_YEAR}/${month}`).set(data);
+            alert("Diesel logs saved!");
         }
 
-        // ======================================================= //
-        // PAYROLL FUNCTIONS (MODIFIED FOR FIREBASE)               //
-        // ======================================================= //
-
+        // 8. Payroll Logic
         async function showPayrollFile(month) {
             document.getElementById('payroll-file-month').textContent = month;
-            try {
-                const snapshot = await database.ref(`payrollData/${month}`).once('value');
-                const payrollData = snapshot.val() || [];
-                const dataArray = Array.isArray(payrollData) ? payrollData : Object.values(payrollData);
-                buildPayrollTable(dataArray);
-                showPage('payroll-file');
-            } catch (error) {
-                console.error("Could not fetch payroll data: ", error);
-                alert("Error fetching data. Check console for details.");
-            }
+            const snapshot = await database.ref(`payrollData/${SELECTED_YEAR}/${month}`).once('value');
+            const data = snapshot.val() || [];
+            renderPayrollTable(Array.isArray(data) ? data : Object.values(data));
+            showPage('payroll-file');
+        }
+
+        function renderPayrollTable(data) {
+            const tbody = document.getElementById('payroll-table-body');
+            tbody.innerHTML = '';
+            (data.length > 0 ? data : [{}]).forEach(d => addPayrollRowHtml(d));
+            calcPayroll();
+        }
+
+        function addPayrollRow() { addPayrollRowHtml({}); }
+
+        function addPayrollRowHtml(d) {
+            const tr = document.createElement('tr');
+            tr.className = "border-b";
+            tr.innerHTML = `
+                <td class="p-1"><div contenteditable="true" class="p-name">${d.name||''}</div></td>
+                <td class="p-1"><div contenteditable="true" class="p-veh">${d.vehicle||''}</div></td>
+                <td class="p-1"><div contenteditable="true" class="p-km" onblur="calcPayroll()">${d.km||0}</div></td>
+                <td class="p-1"><div contenteditable="true" class="p-rate" onblur="calcPayroll()">${d.rate||0}</div></td>
+                <td class="p-1 bg-slate-50 p-base font-bold">0</td>
+                <td class="p-1"><div contenteditable="true" class="p-ins" onblur="calcPayroll()">${d.insurance||0}</div></td>
+                <td class="p-1"><div contenteditable="true" class="p-oil" onblur="calcPayroll()">${d.oilSaved||0}</div></td>
+                <td class="p-1 bg-slate-50 p-gross font-bold">0</td>
+                <td class="p-1"><div contenteditable="true" class="p-tax" onblur="calcPayroll()">${d.incomeTax||0}</div></td>
+                <td class="p-1"><div contenteditable="true" class="p-pen" onblur="calcPayroll()">${d.penalty||0}</div></td>
+                <td class="p-1 bg-indigo-50 p-net font-black">0</td>
+                <td class="p-1"><button onclick="this.parentElement.parentElement.remove(); calcPayroll()">×</button></td>
+            `;
+            document.getElementById('payroll-table-body').appendChild(tr);
+        }
+
+        function calcPayroll() {
+            document.querySelectorAll('#payroll-table-body tr').forEach(row => {
+                const km = parseNum(row.querySelector('.p-km').textContent);
+                const rate = parseNum(row.querySelector('.p-rate').textContent);
+                const ins = parseNum(row.querySelector('.p-ins').textContent);
+                const oil = parseNum(row.querySelector('.p-oil').textContent);
+                const tax = parseNum(row.querySelector('.p-tax').textContent);
+                const pen = parseNum(row.querySelector('.p-pen').textContent);
+
+                const base = km * rate;
+                const gross = base + ins + oil;
+                const net = gross - tax - pen;
+
+                row.querySelector('.p-base').textContent = base.toLocaleString();
+                row.querySelector('.p-gross').textContent = gross.toLocaleString();
+                row.querySelector('.p-net').textContent = "₹" + net.toLocaleString();
+            });
         }
 
         async function savePayrollData() {
             const month = document.getElementById('payroll-file-month').textContent;
-            if (!month) return alert('Error: No payroll month selected.');
-
             const data = [];
             document.querySelectorAll('#payroll-table-body tr').forEach(row => {
-                const name = row.querySelector('.name-cell').innerText.trim();
-                const vehicle = row.querySelector('.vehicle-cell').innerText.trim().toUpperCase();
-                const km = parseCurrency(row.querySelector('.km-cell').innerText);
-                const rate = parseCurrency(row.querySelector('.rate-cell').innerText);
-                const insurance = parseCurrency(row.querySelector('.insurance-cell').innerText);
-                const oilSaved = parseCurrency(row.querySelector('.oil-saved-cell').innerText);
-                const incomeTax = parseCurrency(row.querySelector('.incometax-cell').innerText);
-                const penalty = parseCurrency(row.querySelector('.penalty-cell').innerText);
-                const lessOther = parseCurrency(row.querySelector('.less-other-cell').innerText);
-
-                if (name || vehicle || km || rate || insurance || oilSaved || incomeTax || penalty || lessOther) {
-                    data.push({ name, vehicle, km, rate, insurance, oilSaved, incomeTax, penalty, lessOther });
-                }
-            });
-            
-            try {
-                await database.ref(`payrollData/${month}`).set(data);
-                alert(`Payroll data for ${month} saved successfully!`);
-            } catch (error) {
-                console.error("Error saving payroll data: ", error);
-                alert("Error saving data to Firebase. See console for details.");
-            }
-        }
-
-        // --- UNMODIFIED HELPER & UI FUNCTIONS ---
-        function buildTableWithData(data) {
-            const tableBody = document.getElementById('audit-table-body');
-            tableBody.innerHTML = '';
-            let dataToRender = data.length > 0 ? data : [{ busNumber: '', revenue: '', expense: '' }];
-            dataToRender.forEach((rowData, index) => {
-                const i = index + 1;
-                const row = document.createElement('tr');
-                row.className = i % 2 === 0 ? 'bg-slate-100' : 'bg-slate-50';
-                row.id = `row-${i}`;
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${i}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-900 bus-number-cell" contenteditable="true" data-placeholder="Enter bus no." onblur="updateRowAndTotals()">${rowData.busNumber || ''}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-green-600 revenue-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updateRowAndTotals();">${rowData.revenue ? rowData.revenue.toLocaleString() : ''}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-red-600 expense-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updateRowAndTotals();">${rowData.expense ? rowData.expense.toLocaleString() : ''}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium profit-cell"></td>
-                    <td class="px-6 py-4 text-center"><button onclick="deleteRow(${i})" class="text-red-400 hover:text-red-600 font-bold text-lg">&times;</button></td>
-                `;
-                tableBody.appendChild(row);
-            });
-            updateRowAndTotals();
-        }
-        function addRow() {
-            const tableBody = document.getElementById('audit-table-body');
-            const newIndex = tableBody.rows.length + 1;
-            const newRow = document.createElement('tr');
-            newRow.className = newIndex % 2 === 0 ? 'bg-slate-100' : 'bg-slate-50';
-            newRow.id = `row-${newIndex}`;
-            newRow.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${newIndex}</td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-900 bus-number-cell" contenteditable="true" data-placeholder="Enter bus no." onblur="updateRowAndTotals()"></td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm text-green-600 revenue-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updateRowAndTotals();"></td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm text-red-600 expense-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updateRowAndTotals();"></td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium profit-cell"></td>
-                <td class="px-6 py-4 text-center"><button onclick="deleteRow(${newIndex})" class="text-red-400 hover:text-red-600 font-bold text-lg">&times;</button></td>
-            `;
-            tableBody.appendChild(newRow);
-            newRow.querySelector('.bus-number-cell').focus();
-        }
-        function deleteRow(rowIndex) {
-            if (confirm('Are you sure you want to delete this audit row?')) {
-                document.getElementById(`row-${rowIndex}`).remove();
-                const tableBody = document.getElementById('audit-table-body');
-                Array.from(tableBody.rows).forEach((row, index) => {
-                    const i = index + 1;
-                    row.id = `row-${i}`;
-                    row.cells[0].textContent = i;
-                    row.cells[5].querySelector('button').setAttribute('onclick', `deleteRow(${i})`);
+                const name = row.querySelector('.p-name').textContent.trim();
+                if(name) data.push({
+                    name, vehicle: row.querySelector('.p-veh').textContent,
+                    km: parseNum(row.querySelector('.p-km').textContent),
+                    rate: parseNum(row.querySelector('.p-rate').textContent),
+                    insurance: parseNum(row.querySelector('.p-ins').textContent),
+                    oilSaved: parseNum(row.querySelector('.p-oil').textContent),
+                    incomeTax: parseNum(row.querySelector('.p-tax').textContent),
+                    penalty: parseNum(row.querySelector('.p-pen').textContent)
                 });
-                updateRowAndTotals();
-            }
-        }
-        function updateRowAndTotals() {
-            document.querySelectorAll('#audit-table-body tr').forEach(row => {
-                const revenue = parseCurrency(row.querySelector('.revenue-cell').innerText);
-                const expense = parseCurrency(row.querySelector('.expense-cell').innerText);
-                const profit = revenue - expense;
-                const profitCell = row.querySelector('.profit-cell');
-                profitCell.innerText = '₹' + profit.toLocaleString();
-                profitCell.classList.toggle('text-green-600', profit >= 0);
-                profitCell.classList.toggle('text-red-600', profit < 0);
             });
-            updateTableFooter();
+            await database.ref(`payrollData/${SELECTED_YEAR}/${month}`).set(data);
+            alert("Payroll Saved!");
         }
-        function updateTableFooter() {
-            const tableFoot = document.getElementById('audit-table-foot');
-            const totalRevenue = sumColumn('#audit-table-body .revenue-cell');
-            const totalExpense = sumColumn('#audit-table-body .expense-cell');
-            const totalProfit = totalRevenue - totalExpense;
-            tableFoot.innerHTML = `
-                <tr>
-                    <td class="px-6 py-4 text-sm uppercase tracking-wider" colspan="2">Total</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">₹${totalRevenue.toLocaleString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">₹${totalExpense.toLocaleString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}">₹${totalProfit.toLocaleString()}</td>
-                    <td class="px-6 py-4"></td>
-                </tr>`;
-        }
-        function exportToCSV() {
-            const month = document.getElementById('audit-file-month').textContent;
-            let csvContent = "data:text/csv;charset=utf-8,S.No,Bus Number,Credited Money,Expenses,Money Left\n";
-            document.querySelectorAll('#audit-table-body tr').forEach((row, index) => {
-                const cells = row.querySelectorAll('td');
-                const busNumber = cells[1].innerText.trim().replace(/,/g, '');
-                const revenue = parseCurrency(cells[2].innerText);
-                const expense = parseCurrency(cells[3].innerText);
-                const profit = parseCurrency(cells[4].innerText);
-                if(busNumber || revenue || expense) {
-                    csvContent += `${index + 1},${busNumber},${revenue},${expense},${profit}\n`;
+
+        // 9. Reports & Charts
+        async function createOrUpdateCharts() {
+            const snapshot = await database.ref(`auditData/${SELECTED_YEAR}`).once('value');
+            const yearData = snapshot.val() || {};
+            
+            const busStats = {};
+            MONTHS.forEach(m => {
+                if(yearData[m]) {
+                    const entries = Array.isArray(yearData[m]) ? yearData[m] : Object.values(yearData[m]);
+                    entries.forEach(e => {
+                        const b = e.busNumber.toUpperCase();
+                        if(!busStats[b]) busStats[b] = { revenue:0, expense:0, monthly:{} };
+                        busStats[b].revenue += e.revenue;
+                        busStats[b].expense += e.expense;
+                        busStats[b].monthly[m] = { r: e.revenue, e: e.expense };
+                    });
                 }
             });
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `audit_${month.toLowerCase()}_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        function createBusProfitLossChart(labels, profitData, lossData) {
-            const ctx = document.getElementById('busProfitLossChart').getContext('2d');
-            if (profitLossChartInstance) profitLossChartInstance.destroy();
-            profitLossChartInstance = new Chart(ctx, {
+
+            const labels = Object.keys(busStats).sort();
+            if(labels.length === 0) return;
+
+            // Overview Bar Chart
+            const ctx1 = document.getElementById('busProfitLossChart').getContext('2d');
+            if(charts.profit) charts.profit.destroy();
+            charts.profit = new Chart(ctx1, {
                 type: 'bar',
                 data: {
                     labels,
                     datasets: [{
-                        label: 'Profit', data: profitData,
-                        backgroundColor: 'rgba(34, 197, 94, 0.7)', 
-                        borderColor: 'rgba(22, 163, 74, 1)', borderWidth: 1, borderRadius: 4,
-                    }, {
-                        label: 'Loss', data: lossData,
-                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                        borderColor: 'rgba(220, 38, 38, 1)', borderWidth: 1, borderRadius: 4,
+                        label: 'Net Profit',
+                        data: labels.map(l => busStats[l].revenue - busStats[l].expense),
+                        backgroundColor: '#6366f1'
                     }]
-                },
-                options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { callback: value => '₹' + value.toLocaleString() }}}}
+                }
             });
-        }
-        function createRevenuePieChart(labels, revenueData) {
-            const ctx = document.getElementById('revenuePieChart').getContext('2d');
-            if (revenuePieChartInstance) revenuePieChartInstance.destroy();
-            revenuePieChartInstance = new Chart(ctx, {
+
+            // Revenue Pie
+            const ctx2 = document.getElementById('revenuePieChart').getContext('2d');
+            if(charts.pie) charts.pie.destroy();
+            charts.pie = new Chart(ctx2, {
                 type: 'doughnut',
                 data: {
                     labels,
-                    datasets: [{
-                        label: 'Total Revenue', data: revenueData,
-                        backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#3b82f6', '#6366f1', '#ec4899', '#8b5cf6'],
-                        hoverOffset: 8, borderColor: '#f1f5f9',
-                    }]
-                },
-                options: { responsive: true, plugins: { legend: { position: 'top' }}}
-            });
-        }
-        function createMonthlyBusChart(labels, revenueData, expenseData, profitData) {
-            const ctx = document.getElementById('monthlyBusChart').getContext('2d');
-            if (monthlyBusChartInstance) monthlyBusChartInstance.destroy();
-            monthlyBusChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [{
-                        label: 'Revenue', data: revenueData,
-                        borderColor: 'rgba(34, 197, 94, 1)', backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                        fill: true, tension: 0.3
-                    }, {
-                        label: 'Expenses', data: expenseData,
-                        borderColor: 'rgba(239, 68, 68, 1)', backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        fill: true, tension: 0.3
-                    }, {
-                        label: 'Profit', data: profitData,
-                        borderColor: 'rgba(79, 70, 229, 1)', backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        fill: true, tension: 0.3
-                    }]
-                },
-                options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { callback: value => '₹' + value.toLocaleString() }}}}
-            });
-        }
-        function buildPayrollTable(data) {
-            const tableBody = document.getElementById('payroll-table-body');
-            tableBody.innerHTML = '';
-            let dataToRender = data.length > 0 ? data : [{}];
-            dataToRender.forEach((d, index) => {
-                const i = index + 1;
-                const row = document.createElement('tr');
-                row.className = i % 2 === 0 ? 'bg-slate-100' : 'bg-slate-50';
-                row.id = `payroll-row-${i}`;
-                row.innerHTML = `
-                    <td class="p-2 whitespace-nowrap text-slate-900 name-cell" contenteditable="true" data-placeholder="Driver Name">${d.name || ''}</td>
-                    <td class="p-2 whitespace-nowrap text-slate-900 vehicle-cell" contenteditable="true" data-placeholder="Vehicle No">${d.vehicle || ''}</td>
-                    <td class="p-2 whitespace-nowrap text-slate-700 km-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this, false); updatePayrollRowAndTotals();">${d.km ? d.km.toLocaleString() : ''}</td>
-                    <td class="p-2 whitespace-nowrap text-slate-700 rate-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();">${d.rate ? d.rate.toLocaleString() : ''}</td>
-                    <td class="p-2 whitespace-nowrap font-medium bg-slate-200/60 amount-payable-cell"></td>
-                    <td class="p-2 whitespace-nowrap text-blue-600 insurance-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();">${d.insurance ? d.insurance.toLocaleString() : ''}</td>
-                    <td class="p-2 whitespace-nowrap text-blue-600 oil-saved-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();">${d.oilSaved ? d.oilSaved.toLocaleString() : ''}</td>
-                    <td class="p-2 whitespace-nowrap font-medium text-blue-700 bg-slate-200/60 total-payable-cell"></td>
-                    <td class="p-2 whitespace-nowrap text-red-600 incometax-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();">${d.incomeTax ? d.incomeTax.toLocaleString() : ''}</td>
-                    <td class="p-2 whitespace-nowrap text-red-600 penalty-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();">${d.penalty ? d.penalty.toLocaleString() : ''}</td>
-                    <td class="p-2 whitespace-nowrap text-red-600 less-other-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();">${d.lessOther ? d.lessOther.toLocaleString() : ''}</td>
-                    <td class="p-2 whitespace-nowrap font-medium text-red-700 bg-slate-200/60 total-deduction-cell"></td>
-                    <td class="p-2 whitespace-nowrap font-bold text-lg bg-indigo-100 net-payable-cell"></td>
-                    <td class="p-2 text-center"><button onclick="deletePayrollRow(${i})" class="text-red-400 hover:text-red-600 font-bold text-lg">&times;</button></td>
-                `;
-                tableBody.appendChild(row);
-            });
-            updatePayrollRowAndTotals();
-        }
-        function addPayrollRow() {
-            const tableBody = document.getElementById('payroll-table-body');
-            const i = tableBody.rows.length + 1;
-            const row = document.createElement('tr');
-            row.className = i % 2 === 0 ? 'bg-slate-100' : 'bg-slate-50';
-            row.id = `payroll-row-${i}`;
-            row.innerHTML = `
-                <td class="p-2 whitespace-nowrap text-slate-900 name-cell" contenteditable="true" data-placeholder="Driver Name"></td>
-                <td class="p-2 whitespace-nowrap text-slate-900 vehicle-cell" contenteditable="true" data-placeholder="Vehicle No"></td>
-                <td class="p-2 whitespace-nowrap text-slate-700 km-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this, false); updatePayrollRowAndTotals();"></td>
-                <td class="p-2 whitespace-nowrap text-slate-700 rate-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();"></td>
-                <td class="p-2 whitespace-nowrap font-medium bg-slate-200/60 amount-payable-cell"></td>
-                <td class="p-2 whitespace-nowrap text-blue-600 insurance-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();"></td>
-                <td class="p-2 whitespace-nowrap text-blue-600 oil-saved-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();"></td>
-                <td class="p-2 whitespace-nowrap font-medium text-blue-700 bg-slate-200/60 total-payable-cell"></td>
-                <td class="p-2 whitespace-nowrap text-red-600 incometax-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();"></td>
-                <td class="p-2 whitespace-nowrap text-red-600 penalty-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();"></td>
-                <td class="p-2 whitespace-nowrap text-red-600 less-other-cell" contenteditable="true" data-placeholder="0" onblur="formatCellAsCurrency(this); updatePayrollRowAndTotals();"></td>
-                <td class="p-2 whitespace-nowrap font-medium text-red-700 bg-slate-200/60 total-deduction-cell"></td>
-                <td class="p-2 whitespace-nowrap font-bold text-lg bg-indigo-100 net-payable-cell"></td>
-                <td class="p-2 text-center"><button onclick="deletePayrollRow(${i})" class="text-red-400 hover:text-red-600 font-bold text-lg">&times;</button></td>
-            `;
-            tableBody.appendChild(row);
-            row.querySelector('.name-cell').focus();
-        }
-        function deletePayrollRow(rowIndex) {
-            if (confirm('Are you sure you want to delete this payroll row?')) {
-                document.getElementById(`payroll-row-${rowIndex}`).remove();
-                const tableBody = document.getElementById('payroll-table-body');
-                Array.from(tableBody.rows).forEach((row, index) => {
-                    const i = index + 1;
-                    row.id = `payroll-row-${i}`;
-                    row.cells[13].querySelector('button').setAttribute('onclick', `deletePayrollRow(${i})`);
-                });
-                updatePayrollRowAndTotals();
-            }
-        }
-        function updatePayrollRowAndTotals() {
-            document.querySelectorAll('#payroll-table-body tr').forEach(row => {
-                const optedKm = parseCurrency(row.querySelector('.km-cell').innerText);
-                const slabRate = parseCurrency(row.querySelector('.rate-cell').innerText);
-                const insurance = parseCurrency(row.querySelector('.insurance-cell').innerText);
-                const oilSaved = parseCurrency(row.querySelector('.oil-saved-cell').innerText);
-                const incomeTax = parseCurrency(row.querySelector('.incometax-cell').innerText);
-                const penalty = parseCurrency(row.querySelector('.penalty-cell').innerText);
-                const lessOther = parseCurrency(row.querySelector('.less-other-cell').innerText);
-
-                const amountPayable = optedKm * slabRate;
-                const totalPayable = amountPayable + insurance + oilSaved;
-                const totalDeduction = incomeTax + penalty + lessOther;
-                const netPayable = totalPayable - totalDeduction;
-
-                row.querySelector('.amount-payable-cell').innerText = '₹' + amountPayable.toLocaleString();
-                row.querySelector('.total-payable-cell').innerText = '₹' + totalPayable.toLocaleString();
-                row.querySelector('.total-deduction-cell').innerText = '₹' + totalDeduction.toLocaleString();
-                const netPayableCell = row.querySelector('.net-payable-cell');
-                netPayableCell.innerText = '₹' + netPayable.toLocaleString();
-                netPayableCell.classList.toggle('text-green-700', netPayable >= 0);
-                netPayableCell.classList.toggle('text-red-700', netPayable < 0);
-            });
-            updatePayrollFooter();
-        }
-        function updatePayrollFooter() {
-            const footer = document.getElementById('payroll-table-foot');
-            const totalAmountPayable = sumColumn('#payroll-table-body .amount-payable-cell');
-            const totalPayable = sumColumn('#payroll-table-body .total-payable-cell');
-            const totalDeduction = sumColumn('#payroll-table-body .total-deduction-cell');
-            const netPayable = sumColumn('#payroll-table-body .net-payable-cell');
-            footer.innerHTML = `
-                <tr>
-                    <td class="p-3 text-sm uppercase tracking-wider" colspan="4">Total</td>
-                    <td class="p-3 whitespace-nowrap text-sm">₹${totalAmountPayable.toLocaleString()}</td>
-                    <td class="p-3 whitespace-nowrap text-sm" colspan="2"></td>
-                    <td class="p-3 whitespace-nowrap text-sm text-blue-700">₹${totalPayable.toLocaleString()}</td>
-                    <td class="p-3 whitespace-nowrap text-sm" colspan="3"></td>
-                    <td class="p-3 whitespace-nowrap text-sm text-red-700">₹${totalDeduction.toLocaleString()}</td>
-                    <td class="p-3 whitespace-nowrap text-sm font-extrabold ${netPayable >= 0 ? 'text-green-700' : 'text-red-700'}">₹${netPayable.toLocaleString()}</td>
-                    <td class="p-3"></td>
-                </tr>`;
-        }
-        function exportPayrollToCSV() {
-            const month = document.getElementById('payroll-file-month').textContent;
-            const headers = [
-                "Name", "Vehicle Number", "Opted KM", "Slab Rate", "Amount Payable", "Insurance", 
-                "Oil Saved", "Total Payable", "Income Tax", "Penalty", "Less Other(Oil)", 
-                "Total Deduction", "Net Payable"
-            ];
-            let csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + "\n";
-            document.querySelectorAll('#payroll-table-body tr').forEach(row => {
-                const name = row.querySelector('.name-cell').innerText.trim().replace(/,/g, '');
-                if (name) {
-                    const rowData = [
-                        name,
-                        row.querySelector('.vehicle-cell').innerText.trim().replace(/,/g, ''),
-                        parseCurrency(row.querySelector('.km-cell').innerText),
-                        parseCurrency(row.querySelector('.rate-cell').innerText),
-                        parseCurrency(row.querySelector('.amount-payable-cell').innerText),
-                        parseCurrency(row.querySelector('.insurance-cell').innerText),
-                        parseCurrency(row.querySelector('.oil-saved-cell').innerText),
-                        parseCurrency(row.querySelector('.total-payable-cell').innerText),
-                        parseCurrency(row.querySelector('.incometax-cell').innerText),
-                        parseCurrency(row.querySelector('.penalty-cell').innerText),
-                        parseCurrency(row.querySelector('.less-other-cell').innerText),
-                        parseCurrency(row.querySelector('.total-deduction-cell').innerText),
-                        parseCurrency(row.querySelector('.net-payable-cell').innerText)
-                    ];
-                    csvContent += rowData.join(',') + "\n";
+                    datasets: [{ data: labels.map(l => busStats[l].revenue), backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] }]
                 }
             });
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `payroll_report_${month.toLowerCase()}_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        const parseCurrency = (text) => parseFloat(text.replace(/[^0-9.-]+/g, "")) || 0;
-        const sumColumn = (selector) => Array.from(document.querySelectorAll(selector)).reduce((acc, cell) => acc + parseCurrency(cell.innerText), 0);
-        function formatCellAsCurrency(cell, useFractions = true) {
-            let value = parseCurrency(cell.innerText);
-            if (isNaN(value)) value = 0;
-            const options = useFractions ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : {};
-            cell.innerText = value.toLocaleString('en-IN', options);
-        }
-        document.getElementById('mobile-menu-button').addEventListener('click', () => {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
-        window.onload = () => showPage('home');
-    </script>
 
+            // Populate Selector
+            const sel = document.getElementById('bus-selector');
+            sel.innerHTML = '<option value="">Select Bus</option>' + labels.map(l => `<option value="${l}">${l}</option>`).join('');
+            sel.onchange = (e) => showBusDetails(e.target.value, busStats);
+        }
+
+        function showBusDetails(bus, allStats) {
+            const container = document.getElementById('bus-details-container');
+            if(!bus) { container.classList.add('hidden'); return; }
+            container.classList.remove('hidden');
+
+            const s = allStats[bus];
+            document.getElementById('details-bus-number').textContent = bus;
+            document.getElementById('details-total-revenue').textContent = "₹" + s.revenue.toLocaleString();
+            document.getElementById('details-total-expense').textContent = "₹" + s.expense.toLocaleString();
+            const net = s.revenue - s.expense;
+            const netEl = document.getElementById('details-net-profit');
+            netEl.textContent = "₹" + net.toLocaleString();
+            netEl.className = `font-black ${net >= 0 ? 'text-green-600' : 'text-red-600'}`;
+
+            const ctx3 = document.getElementById('monthlyBusChart').getContext('2d');
+            if(charts.trend) charts.trend.destroy();
+            charts.trend = new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: MONTHS,
+                    datasets: [
+                        { label: 'Revenue', data: MONTHS.map(m => s.monthly[m]?.r || 0), borderColor: '#10b981', tension: 0.3 },
+                        { label: 'Expense', data: MONTHS.map(m => s.monthly[m]?.e || 0), borderColor: '#ef4444', tension: 0.3 }
+                    ]
+                }
+            });
+        }
+
+        // 10. Utils
+        function parseNum(str) { return parseFloat(str.replace(/[^0-9.-]+/g, "")) || 0; }
+        function formatMoney(el) { 
+            const val = parseNum(el.textContent);
+            el.textContent = val.toLocaleString();
+        }
+
+        window.onload = () => {
+            buildGrids();
+            showPage('home');
+        };
+    </script>
 </body>
 </html>
