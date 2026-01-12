@@ -4,195 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YASWANTH Fleet Audit</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
 <style>
-body { font-family: 'Inter', sans-serif; }
-.page { display:none; animation:fadeIn .4s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1} }
-[contenteditable=true] { background:#eef2ff; padding:2px 4px; border-radius:4px; }
+body{font-family:'Inter',sans-serif}
+.page{display:none}
 </style>
 </head>
+<body class="bg-slate-100">
 
-<body class="bg-gradient-to-br from-blue-100 to-indigo-200 text-slate-800">
-
-<div class="container mx-auto p-6 max-w-7xl">
-
-<header class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] bg-white/90 backdrop-blur p-4 rounded-xl shadow z-50 flex justify-between">
-  <div class="flex items-center gap-4">
-    <select id="yearSelector" class="border rounded px-2 py-1"></select>
-    <button onclick="adminLogin()" class="bg-slate-800 text-white px-3 py-1 rounded">Admin</button>
-    <span class="font-extrabold text-indigo-600">YASWANTH FLEET</span>
-  </div>
+<header class="bg-white p-4 shadow flex justify-between items-center">
+<div class="flex gap-3 items-center">
+<select id="yearSelector" class="border px-2 py-1 rounded" onchange="changeYear(this.value)"></select>
+<button onclick="adminLogin()" class="bg-black text-white px-3 py-1 rounded">Admin</button>
+</div>
+<nav class="flex gap-4">
+<button onclick="showPage('home')">Home</button>
+<button onclick="showPage('audit')">Audit</button>
+</nav>
 </header>
 
-<div class="h-24"></div>
+<main class="p-6">
+<section id="home" class="page">
+<h1 class="text-2xl font-bold">Dashboard</h1>
+</section>
 
-<main id="home" class="page">
-  <h2 class="text-3xl font-bold text-center mb-8">Dashboard</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div onclick="showPage('monthly')" class="bg-white p-6 rounded shadow cursor-pointer">Monthly Audit</div>
-    <div onclick="showPage('diesel-month')" class="bg-white p-6 rounded shadow cursor-pointer">Diesel Audit</div>
-    <div onclick="showPage('reports')" class="bg-white p-6 rounded shadow cursor-pointer">Reports</div>
-    <div onclick="showPage('payroll-month')" class="bg-white p-6 rounded shadow cursor-pointer">Payroll</div>
-  </div>
+<section id="audit" class="page">
+<h2 class="text-xl font-bold mb-2">Audit</h2>
+<button onclick="openAudit('January')" class="border px-3 py-1">January</button>
+<table class="mt-4 w-full border">
+<thead><tr><th>Bus</th><th>Revenue</th><th>Expense</th></tr></thead>
+<tbody id="auditBody"></tbody>
+</table>
+<button onclick="saveAudit()" class="bg-green-600 text-white px-3 py-1 mt-2">Save</button>
+</section>
 </main>
 
-<section id="monthly" class="page bg-white p-6 rounded shadow">
-  <h2 class="text-xl font-bold mb-4">Select Month</h2>
-  <div class="grid grid-cols-3 md:grid-cols-6 gap-3" id="monthButtons"></div>
-</section>
-
-<section id="audit" class="page bg-white p-6 rounded shadow">
-  <h2 class="text-xl font-bold mb-4">Audit – <span id="auditMonth"></span></h2>
-  <button onclick="addAuditRow()" class="bg-indigo-600 text-white px-3 py-1 rounded">Add</button>
-  <button onclick="saveAudit()" class="bg-green-600 text-white px-3 py-1 rounded ml-2">Save</button>
-
-  <table class="w-full mt-4 border">
-    <thead class="bg-slate-200">
-      <tr><th>#</th><th>Bus</th><th>Revenue</th><th>Expense</th><th>Profit</th><th></th></tr>
-    </thead>
-    <tbody id="auditBody"></tbody>
-    <tfoot id="auditFoot"></tfoot>
-  </table>
-</section>
-
-<section id="diesel-month" class="page bg-white p-6 rounded shadow"></section>
-<section id="diesel" class="page bg-white p-6 rounded shadow"></section>
-
-<section id="payroll-month" class="page bg-white p-6 rounded shadow"></section>
-<section id="payroll" class="page bg-white p-6 rounded shadow"></section>
-
-<section id="reports" class="page bg-white p-6 rounded shadow">
-  <canvas id="profitChart"></canvas>
-</section>
-
-</div>
-
 <script>
-/* ================= FIREBASE ================= */
 firebase.initializeApp({
-  apiKey:"AIzaSyBQrSN31bs0dqpyZVT_IeGktPEy7rMrqcQ",
-  databaseURL:"https://yaswanth-fleet-default-rtdb.firebaseio.com"
+  apiKey: "AIzaSyBQrSN31bs0dqpyZVT_IeGktPEy7rMrqcQ",
+  databaseURL: "https://yaswanth-fleet-default-rtdb.firebaseio.com"
 });
 const db = firebase.database();
 
-/* ================= GLOBAL ================= */
-const YEARS=[2025,2026,2027];
-const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const YEARS = [2025,2026,2027];
+let CURRENT_YEAR = Number(localStorage.getItem('fleetYear')) || 2026;
+let CURRENT_MONTH = "";
+let IS_ADMIN = false;
 
-let CURRENT_YEAR=Number(localStorage.getItem("year"))||2026;
-let CURRENT_MONTH="";
-let IS_ADMIN=false;
-
-/* ================= INIT ================= */
-window.onload=()=>{
+window.onload = () => {
   initYearSelector();
-  buildMonthButtons();
-  showPage("home");
+  showPage('home');
 };
 
 function initYearSelector(){
-  const s=document.getElementById("yearSelector");
+  const sel = document.getElementById('yearSelector');
+  sel.innerHTML = "";
   YEARS.forEach(y=>{
-    const o=document.createElement("option");
-    o.value=y; o.text=y;
-    if(y===CURRENT_YEAR)o.selected=true;
-    s.appendChild(o);
+    const o=document.createElement('option');
+    o.value=y;o.text=y;
+    if(y===CURRENT_YEAR) o.selected=true;
+    sel.appendChild(o);
   });
-  s.onchange=e=>{
-    CURRENT_YEAR=Number(e.target.value);
-    localStorage.setItem("year",CURRENT_YEAR);
-    showPage("home");
-  };
 }
 
-/* ================= NAV ================= */
-function showPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
-  document.getElementById(id).style.display="block";
+function changeYear(y){
+  CURRENT_YEAR = Number(y);
+  localStorage.setItem('fleetYear', CURRENT_YEAR);
+  showPage('home');
 }
 
-/* ================= ADMIN ================= */
 function adminLogin(){
-  const pin=prompt("Enter PIN");
-  if(pin==="1234"){IS_ADMIN=true;alert("Admin enabled");}
+  const pin = prompt("Enter Admin PIN");
+  if(pin==="1234"){
+    IS_ADMIN=true;
+    alert("Admin enabled");
+  } else alert("Wrong PIN");
 }
 
-/* ================= MONTH UI ================= */
-function buildMonthButtons(){
-  const c=document.getElementById("monthButtons");
-  c.innerHTML="";
-  MONTHS.forEach(m=>{
-    const b=document.createElement("button");
-    b.textContent=m;
-    b.className="border p-2 rounded";
-    b.onclick=()=>openAudit(m);
-    c.appendChild(b);
-  });
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  document.getElementById(id).style.display='block';
 }
 
-/* ================= AUDIT ================= */
-async function openAudit(month){
-  CURRENT_MONTH=month;
-  document.getElementById("auditMonth").innerText=month;
-  const snap=await db.ref(`auditData/${CURRENT_YEAR}/${month}`).once("value");
-  renderAudit(Object.values(snap.val()||[]));
-  showPage("audit");
+function openAudit(month){
+  CURRENT_MONTH = month;
+  loadAudit();
+  showPage('audit');
 }
 
-function renderAudit(rows){
-  const body=document.getElementById("auditBody");
-  body.innerHTML="";
-  (rows.length?rows:[{}]).forEach((r,i)=>{
-    body.innerHTML+=`
-    <tr>
-      <td>${i+1}</td>
+function loadAudit(){
+  db.ref(`auditData/${CURRENT_YEAR}/${CURRENT_MONTH}`).once('value').then(s=>{
+    const data=s.val()||[];
+    const arr=Array.isArray(data)?data:Object.values(data);
+    const body=document.getElementById('auditBody');
+    body.innerHTML="";
+    (arr.length?arr:[{}]).forEach(r=>{
+      body.innerHTML+=`<tr>
       <td contenteditable="${IS_ADMIN}">${r.bus||""}</td>
-      <td contenteditable="${IS_ADMIN}">${r.rev||""}</td>
-      <td contenteditable="${IS_ADMIN}">${r.exp||""}</td>
-      <td>${(r.rev||0)-(r.exp||0)}</td>
-      <td></td>
-    </tr>`;
-  });
-}
-
-async function saveAudit(){
-  if(!IS_ADMIN)return alert("Admin only");
-  const rows=[];
-  document.querySelectorAll("#auditBody tr").forEach(r=>{
-    rows.push({
-      bus:r.cells[1].innerText,
-      rev:+r.cells[2].innerText||0,
-      exp:+r.cells[3].innerText||0
+      <td contenteditable="${IS_ADMIN}">${r.revenue||""}</td>
+      <td contenteditable="${IS_ADMIN}">${r.expense||""}</td>
+      </tr>`;
     });
   });
-  await db.ref(`auditData/${CURRENT_YEAR}/${CURRENT_MONTH}`).set(rows);
-  alert("Saved");
 }
 
-/* ================= REPORTS ================= */
-async function loadReports(){
-  const snap=await db.ref(`auditData/${CURRENT_YEAR}`).once("value");
-  const data=snap.val()||{};
-  const totals={};
-  Object.values(data).flat().forEach(r=>{
-    if(!totals[r.bus])totals[r.bus]=0;
-    totals[r.bus]+=r.rev-r.exp;
+function saveAudit(){
+  if(!IS_ADMIN) return alert("Admin only");
+  const data=[];
+  document.querySelectorAll('#auditBody tr').forEach(tr=>{
+    data.push({
+      bus: tr.cells[0].innerText,
+      revenue: Number(tr.cells[1].innerText)||0,
+      expense: Number(tr.cells[2].innerText)||0
+    });
   });
-  new Chart(document.getElementById("profitChart"),{
-    type:"bar",
-    data:{labels:Object.keys(totals),datasets:[{label:"Profit",data:Object.values(totals)}]}
-  });
+  db.ref(`auditData/${CURRENT_YEAR}/${CURRENT_MONTH}`).set(data);
+  alert("Saved");
 }
 </script>
 
