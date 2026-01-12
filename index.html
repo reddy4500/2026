@@ -429,6 +429,28 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+// ===== YEAR STATE (FIXED) =====
+let CURRENT_YEAR = 2026;
+
+function initYearSelector() {
+  const selector = document.getElementById("yearSelector");
+  if (!selector) return;
+  selector.innerHTML = "";
+  [2025, 2026, 2027].forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    if (y === CURRENT_YEAR) opt.selected = true;
+    selector.appendChild(opt);
+  });
+}
+
+function changeYear(year) {
+  CURRENT_YEAR = Number(year);
+  alert("Year changed to " + CURRENT_YEAR);
+}
+
+
         // --- Global Variables ---
         const pages = document.querySelectorAll('.page');
         let profitLossChartInstance = null;
